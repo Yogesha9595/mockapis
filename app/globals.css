@@ -24,3 +24,10 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+aside a {
+  transition: color .15s ease;
+}
+
+aside a:hover {
+  color: #2563eb;
+}
