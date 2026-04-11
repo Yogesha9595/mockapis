@@ -17,7 +17,7 @@ export default function UnitConverterPage() {
   const currentUnits =
     category === "temperature"
       ? ["celsius", "fahrenheit", "kelvin"]
-      : Object.keys(units[category] || {})
+      Object.keys(units[category as keyof typeof units] || {})
 
   useEffect(() => {
     if (!from || !to) return
