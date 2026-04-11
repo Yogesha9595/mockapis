@@ -1,58 +1,56 @@
 import { baseConvert } from "./baseConvert"
 import { units } from "./units"
 
-// 🔥 derive types from units
+// 🔥 derive types
 type UnitsType = typeof units
+type UnitCategory = keyof UnitsType | "temperature"
 
-export const converterEngines = {
+// 🔥 generic engine type
+type ConverterEngine = {
+  convert: (value: number, from: string, to: string) => number
+}
+
+export const converterEngines: Record<UnitCategory, ConverterEngine> = {
   length: {
-    convert: (
-      value: number,
-      from: keyof UnitsType["length"],
-      to: keyof UnitsType["length"]
-    ) => {
-      return baseConvert(value, units.length[from], units.length[to])
+    convert: (value, from, to) => {
+      const f = from as keyof UnitsType["length"]
+      const t = to as keyof UnitsType["length"]
+      return baseConvert(value, units.length[f], units.length[t])
     },
   },
 
   weight: {
-    convert: (
-      value: number,
-      from: keyof UnitsType["weight"],
-      to: keyof UnitsType["weight"]
-    ) => {
-      return baseConvert(value, units.weight[from], units.weight[to])
+    convert: (value, from, to) => {
+      const f = from as keyof UnitsType["weight"]
+      const t = to as keyof UnitsType["weight"]
+      return baseConvert(value, units.weight[f], units.weight[t])
     },
   },
 
   speed: {
-    convert: (
-      value: number,
-      from: keyof UnitsType["speed"],
-      to: keyof UnitsType["speed"]
-    ) => {
-      return baseConvert(value, units.speed[from], units.speed[to])
+    convert: (value, from, to) => {
+      const f = from as keyof UnitsType["speed"]
+      const t = to as keyof UnitsType["speed"]
+      return baseConvert(value, units.speed[f], units.speed[t])
     },
   },
 
   data: {
-    convert: (
-      value: number,
-      from: keyof UnitsType["data"],
-      to: keyof UnitsType["data"]
-    ) => {
-      return baseConvert(value, units.data[from], units.data[to])
+    convert: (value, from, to) => {
+      const f = from as keyof UnitsType["data"]
+      const t = to as keyof UnitsType["data"]
+      return baseConvert(value, units.data[f], units.data[t])
     },
   },
 
   temperature: {
-    convert: (value: number, from: string, to: string) => {
+    convert: (value, from, to) => {
       if (from === to) return value
 
       let celsius = value
 
       if (from === "fahrenheit") celsius = (value - 32) * (5 / 9)
-      if (from === "kelvin") celsius = value - 273.15
+      else if (from === "kelvin") celsius = value - 273.15
 
       if (to === "fahrenheit") return celsius * (9 / 5) + 32
       if (to === "kelvin") return celsius + 273.15
