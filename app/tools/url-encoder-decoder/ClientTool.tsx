@@ -27,7 +27,7 @@ export default function ClientTool() {
   const [encoding, setEncoding] = useState("utf-8")
   const [hashType, setHashType] = useState("SHA-256")
 
-  /* ✅ INIT FROM URL (FIXED deps) */
+  /* ✅ INIT FROM URL */
   useEffect(() => {
     const val = searchParams.get("input")
     const t = searchParams.get("tool")
@@ -36,7 +36,7 @@ export default function ClientTool() {
     if (t === "url" || t === "base64" || t === "hash") {
       setTool(t)
     }
-  }, [searchParams]) // ✅ FIX
+  }, [searchParams])
 
   /* ✅ CONVERT */
   const convert = async () => {
@@ -79,12 +79,10 @@ export default function ClientTool() {
     }
   }
 
-  /* ✅ AUTO (FIXED deps) */
+  /* ✅ AUTO */
   useEffect(() => {
-    if (auto) {
-      convert()
-    }
-  }, [input, mode, tool, encoding, hashType, auto]) // ✅ FIX
+    if (auto) convert()
+  }, [input, mode, tool, encoding, hashType, auto])
 
   /* COPY */
   const copy = async () => {
@@ -122,6 +120,76 @@ export default function ClientTool() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <main className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-4xl mx-auto space-y-6">
 
-      {/* 🚀 UI stays EXACT SAME BELOW */}
+        {/* 🔥 TOOL SELECT */}
+        <div className="flex gap-3">
+          {["url", "base64", "hash"].map((t) => (
+            <button
+              key={t}
+              onClick={() => setTool(t as any)}
+              className={`px-4 py-2 rounded ${
+                tool === t ? "bg-black text-white" : "bg-white border"
+              }`}
+            >
+              {t.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        {/* 🔥 INPUT */}
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Enter input..."
+          className="w-full border p-3 rounded"
+        />
+
+        {/* 🔥 ACTIONS */}
+        <div className="flex gap-3 flex-wrap">
+          <button onClick={convert} className="bg-blue-600 text-white px-4 py-2 rounded">
+            Convert
+          </button>
+
+          <button onClick={copy} className="bg-green-600 text-white px-4 py-2 rounded">
+            {copied ? "Copied!" : "Copy"}
+          </button>
+
+          <button onClick={share} className="bg-purple-600 text-white px-4 py-2 rounded">
+            Share
+          </button>
+
+          <button onClick={clear} className="bg-gray-600 text-white px-4 py-2 rounded">
+            Clear
+          </button>
+        </div>
+
+        {/* 🔥 OUTPUT */}
+        <textarea
+          value={output}
+          readOnly
+          placeholder="Output..."
+          className="w-full border p-3 rounded bg-gray-100"
+        />
+
+        {/* 🔥 ERROR */}
+        {error && <p className="text-red-500">{error}</p>}
+
+        {/* 🔥 FILE */}
+        <input
+          type="file"
+          onChange={(e) => e.target.files && handleFile(e.target.files[0])}
+        />
+
+        {fileName && <p className="text-sm text-gray-500">Loaded: {fileName}</p>}
+
+        {/* 🔗 BACK */}
+        <Link href="/tools" className="text-blue-600 underline">
+          ← Back to tools
+        </Link>
+
+      </div>
+    </main>
+  )
+}
