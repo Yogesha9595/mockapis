@@ -1,12 +1,15 @@
-import type { NextConfig } from "next";
-import createMDX from "@next/mdx";
+import type { NextConfig } from "next"
+import createMDX from "@next/mdx"
 
 // ✅ MDX plugin
 const withMDX = createMDX({
   extension: /\.mdx?$/,
-});
+})
 
 const nextConfig: NextConfig = {
+  // 🔥 CRITICAL FIX (Cloudflare Pages)
+  output: "export",
+
   // ✅ Enable MDX support
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
 
@@ -18,15 +21,9 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "react-icons"],
   },
 
-  // ✅ Image optimization
+  // ⚠️ IMPORTANT: Static export requires this
   images: {
-    formats: ["image/avif", "image/webp"],
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**",
-      },
-    ],
+    unoptimized: true, // 🔥 REQUIRED for static export
   },
 
   // ✅ Compression
@@ -38,21 +35,12 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "X-Frame-Options",
-            value: "SAMEORIGIN",
-          },
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
       },
-    ];
+    ]
   },
 
   // ✅ Redirects
@@ -63,9 +51,9 @@ const nextConfig: NextConfig = {
         destination: "/",
         permanent: true,
       },
-    ];
+    ]
   },
-};
+}
 
-// ✅ Only MDX plugin now (NO next-intl)
-export default withMDX(nextConfig);
+// ✅ Export with MDX
+export default withMDX(nextConfig)
