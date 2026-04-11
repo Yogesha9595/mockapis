@@ -6,7 +6,7 @@ import { convertUnit } from "@/lib/converterEngine"
 import { units } from "@/data/units"
 import { unitCategories } from "@/data/unitCategories"
 
-type UnitCategory = keyof typeof units
+type UnitCategory = keyof typeof units | "temperature"
 
 export default function UnitConverterPage() {
   const [category, setCategory] = useState<UnitCategory>("length")
