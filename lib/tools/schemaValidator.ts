@@ -1,5 +1,18 @@
+// ✅ Types
+type ExtractedSchema = Record<string, any>
+
+type SchemaValidationResult = {
+  type?: string
+  valid: boolean
+  missing?: string[]
+  score?: number
+  suggestions?: string[]
+  data?: any
+  error?: string
+} | SchemaValidationResult[]
+
 // ✅ Extract JSON-LD from HTML (for URL mode)
-export function extractSchemaFromHTML(html: string) {
+export function extractSchemaFromHTML(html: string): ExtractedSchema[] {
   const regex =
     /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi
 
@@ -13,11 +26,11 @@ export function extractSchemaFromHTML(html: string) {
         return null
       }
     })
-    .filter(Boolean)
+    .filter((item): item is ExtractedSchema => Boolean(item))
 }
 
 // ✅ Main validator (supports string OR object)
-export function validateSchema(input: any) {
+export function validateSchema(input: any): SchemaValidationResult {
   let json: any
 
   // Handle string input (manual JSON)
@@ -34,12 +47,12 @@ export function validateSchema(input: any) {
     json = input
   }
 
-  // Handle array schemas (rare but possible)
+  // Handle array schemas (recursive case)
   if (Array.isArray(json)) {
     return json.map((item) => validateSchema(item))
   }
 
-  const type = json["@type"] || "Unknown"
+  const type: string = json["@type"] || "Unknown"
 
   // ✅ Required fields per schema type
   const requiredFields: Record<string, string[]> = {
@@ -55,7 +68,7 @@ export function validateSchema(input: any) {
   const missing = required.filter((field) => {
     const value = json[field]
 
-    // Handle nested object cases (like author)
+    // Handle nested object cases
     if (typeof value === "object") {
       return !value || Object.keys(value).length === 0
     }
@@ -66,7 +79,7 @@ export function validateSchema(input: any) {
   // ✅ Score logic
   const score = Math.max(0, 100 - missing.length * 20)
 
-  // ✅ Additional insights
+  // ✅ Suggestions
   const suggestions: string[] = []
 
   if (!json["@context"]) {
