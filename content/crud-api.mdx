@@ -1,0 +1,71 @@
+---
+title: CRUD Operations in API (Complete Guide with Examples for Beginners)
+description: Learn CRUD operations in APIs using HTTP methods like GET, POST, PUT, DELETE with real-world examples and best practices.
+category: development
+readingTime: 10 min
+keywords: ["crud api", "crud operations", "rest api crud", "create read update delete api"]
+date: "2026-03-29"
+faqs:
+  - question: What is CRUD in API?
+    answer: CRUD stands for Create, Read, Update, Delete. These are the basic operations used to manage data in APIs.
+  - question: Which HTTP methods are used in CRUD?
+    answer: POST, GET, PUT, DELETE are used for CRUD operations.
+  - question: Why is CRUD important?
+    answer: CRUD forms the foundation of data-driven applications.
+  - question: Is CRUD used in REST API?
+    answer: Yes, REST APIs are built around CRUD operations.
+  - question: What is CRUD example?
+    answer: A user API where you can create, read, update, and delete users.
+  - question: Can CRUD be used in databases?
+    answer: Yes, CRUD is used in both APIs and databases.
+---
+
+## Introduction
+
+If you’ve ever worked with APIs, you’ve already used CRUD — even if you didn’t realize it.
+
+CRUD is the foundation of almost every modern application. Whether you're building a blog, an e-commerce platform, or a SaaS product, everything revolves around creating, reading, updating, and deleting data.
+
+In this guide, you’ll learn CRUD in a way that actually makes sense — with real examples and clear explanations.
+
+---
+
+## What is CRUD?
+
+CRUD stands for:
+
+- Create  
+- Read  
+- Update  
+- Delete  
+
+These four operations define how you interact with data.
+
+Think of it like managing users in an app:
+
+- Create → Add a new user  
+- Read → Get user details  
+- Update → Edit user info  
+- Delete → Remove user  
+
+---
+
+## HTTP Methods Mapping
+
+Each CRUD operation maps to an HTTP method:
+
+| Operation | Method | Description |
+|----------|--------|-------------|
+| Create | POST | Add new data |
+| Read | GET | Fetch data |
+| Update | PUT | Modify existing data |
+| Delete | DELETE | Remove data |
+
+---
+
+## Real API Examples
+
+### Create (POST)
+
+```http
+POST /api/users

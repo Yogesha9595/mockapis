@@ -3,12 +3,19 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import { tools } from "@/data/tools"
+import { motion } from "framer-motion"
 
 type Tool = {
   slug: string
   name: string
   description?: string
   category?: string
+}
+
+/* 🔥 STATIC TOOL PATHS */
+const STATIC_TOOL_PATHS: Record<string, string> = {
+  "view-source": "/tools/view-source",
+  "url-encoder-decoder": "/tools/url-encoder-decoder",
 }
 
 export default function ToolsPage() {
@@ -24,105 +31,137 @@ export default function ToolsPage() {
     text: "Text Tools"
   }
 
-  // Memoize filtered tools for better performance
   const filteredTools = useMemo(() => {
-    const normalizedQuery = query.toLowerCase().trim()
-    if (!normalizedQuery) return tools as Tool[]
+    const q = query.toLowerCase().trim()
+    if (!q) return tools as Tool[]
 
-    return (tools as Tool[]).filter((tool) => {
-      const name = tool.name?.toLowerCase() || ""
-      const description = tool.description?.toLowerCase() || ""
-      return name.includes(normalizedQuery) || description.includes(normalizedQuery)
-    })
+    return (tools as Tool[]).filter((tool) =>
+      tool.name?.toLowerCase().includes(q) ||
+      tool.description?.toLowerCase().includes(q)
+    )
   }, [query])
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      {/* Page Title */}
-      <header className="mb-10 text-center md:text-left">
-        <h1 className="text-4xl font-extrabold mb-3 text-gray-900 tracking-tight">
-          Developer Tools
+    <main className="min-h-screen bg-white dark:bg-[#020617] text-gray-900 dark:text-gray-100 px-4 py-12">
+
+      {/* 🔥 HERO */}
+      <section className="max-w-6xl mx-auto mb-14">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+          Developer Tools Hub
         </h1>
-        <p className="text-lg text-gray-600 max-w-2xl">
-          Free, secure, browser-based utilities for formatting, encoding, 
-          and transforming data instantly without server-side processing.
+
+        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl">
+          Free online tools to encode, decode, format, and transform data instantly.
+          Built for developers with speed, privacy, and simplicity.
         </p>
-      </header>
+      </section>
 
-      {/* Search Bar */}
-      <div className="relative mb-12 group">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <svg className="h-5 w-5 text-gray-400 group-focus-within:text-teal-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
-          </svg>
+      {/* 🔍 SEARCH (UPGRADED) */}
+      <section className="max-w-6xl mx-auto mb-14">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search tools (JSON, Base64, URL, JWT...)"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#020617] px-5 py-4 text-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+
+          {/* subtle glow */}
+          <div className="absolute inset-0 rounded-xl pointer-events-none ring-1 ring-inset ring-white/10 dark:ring-white/5" />
         </div>
-        <input
-          type="text"
-          placeholder="Search for a tool (e.g. 'JSON', 'Base64', 'JWT')..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl p-4 pl-12 text-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white"
-        />
-      </div>
+      </section>
 
-      {/* Category Sections */}
-      <div className="space-y-16">
+      {/* 🧰 TOOLS */}
+      <section className="max-w-6xl mx-auto space-y-16">
+
         {Object.entries(categories).map(([key, label]) => {
-          const categoryTools = filteredTools.filter((tool) => tool.category === key)
+          const categoryTools = filteredTools.filter(
+            (tool) => tool.category === key
+          )
 
-          if (categoryTools.length === 0) return null
+          if (!categoryTools.length) return null
 
           return (
-            <section key={key} aria-labelledby={`heading-${key}`}>
-              <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
-                <h2 id={`heading-${key}`} className="text-2xl font-bold text-gray-800">
+            <div key={key}>
+
+              {/* CATEGORY */}
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-semibold tracking-tight">
                   {label}
                 </h2>
-                <Link
-                  href={`/tools/category/${key}`}
-                  className="text-sm font-medium text-teal-600 hover:text-teal-700 hover:underline transition"
-                >
-                  View all tools →
-                </Link>
+
+                <span className="text-sm text-gray-500">
+                  {categoryTools.length} tools
+                </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {categoryTools.map((tool) => (
-                  <Link
-                    key={tool.slug}
-                    href={`/tools/${tool.slug}`}
-                    className="group border border-gray-100 rounded-xl p-5 hover:border-teal-500 hover:shadow-lg transition-all bg-white"
-                  >
-                    <h3 className="font-bold text-gray-900 mb-2 group-hover:text-teal-600 transition-colors">
-                      {tool.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">
-                      {tool.description || "Utility for processing and transforming data."}
-                    </p>
-                  </Link>
-                ))}
+              {/* GRID */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                {categoryTools.map((tool) => {
+                  const path = STATIC_TOOL_PATHS[tool.slug]
+
+                  return (
+                    <motion.div
+                      key={tool.slug}
+                      whileHover={{ y: -6 }}
+                      transition={{ duration: 0.2 }}
+                      className={`group relative rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#020617] p-5 transition ${
+                        path
+                          ? "hover:border-green-500/40 hover:shadow-xl cursor-pointer"
+                          : "opacity-60 cursor-not-allowed"
+                      }`}
+                    >
+
+                      {/* LINK */}
+                      {path ? (
+                        <Link href={path}>
+                          <h3 className="font-semibold text-base mb-2 group-hover:text-green-500 transition">
+                            {tool.name}
+                          </h3>
+                        </Link>
+                      ) : (
+                        <h3 className="font-semibold text-base mb-2">
+                          {tool.name}
+                        </h3>
+                      )}
+
+                      {/* DESC */}
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                        {tool.description || "Developer utility tool"}
+                      </p>
+
+                      {/* STATUS */}
+                      {!path && (
+                        <div className="mt-3 text-xs text-gray-400">
+                          Coming soon
+                        </div>
+                      )}
+
+                      {/* HOVER GLOW */}
+                      {path && (
+                        <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition bg-gradient-to-r from-green-500/5 to-emerald-500/5" />
+                      )}
+                    </motion.div>
+                  )
+                })}
+
               </div>
-            </section>
+            </div>
           )
         })}
-      </div>
+      </section>
 
-      {/* Empty Search State */}
+      {/* EMPTY */}
       {filteredTools.length === 0 && query && (
-        <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-          <div className="text-5xl mb-4">🔍</div>
-          <h3 className="text-xl font-semibold text-gray-800">No tools found</h3>
-          <p className="text-gray-500 mt-2">
-            We couldn't find anything matching "<span className="font-medium">{query}</span>".
+        <div className="text-center mt-20">
+          <p className="text-gray-500 dark:text-gray-400">
+            No tools found for "{query}"
           </p>
-          <button 
-            onClick={() => setQuery("")}
-            className="mt-6 text-teal-600 font-medium hover:underline"
-          >
-            Clear search and view all tools
-          </button>
         </div>
       )}
-    </div>
+
+    </main>
   )
 }
