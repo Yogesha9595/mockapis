@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { unitCategories } from "@/data/unitCategories"
 
-// ✅ FIX: Proper typing
+// ✅ Proper typing
 type PageProps = {
   params: {
     category: string
@@ -9,7 +9,9 @@ type PageProps = {
 }
 
 export default function CategoryPage({ params }: PageProps) {
-  const converters = unitCategories[params.category]
+  // ✅ FIX: safe key casting
+  const categoryKey = params.category as keyof typeof unitCategories
+  const converters = unitCategories[categoryKey]
 
   if (!converters) {
     return <div className="py-20 text-center">Category not found</div>
@@ -33,7 +35,7 @@ export default function CategoryPage({ params }: PageProps) {
               href={`/convert/${conversion}`}
               className="border p-5 rounded hover:shadow"
             >
-              <h2 className="font-semibold">
+              <h2 className="font-semibold capitalize">
                 {from} to {to}
               </h2>
 
