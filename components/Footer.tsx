@@ -1,230 +1,166 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
-import { useState } from "react"
+import { Send, Globe } from "lucide-react"
+import { FaGithub, FaLinkedin, FaFacebook } from "react-icons/fa"
+import { motion } from "framer-motion"
 
 export default function Footer() {
-
-  const [open, setOpen] = useState(false)
+  const fadeUp = {
+    hidden: { opacity: 0, y: 20 },
+    show: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.1, duration: 0.4 }
+    })
+  }
 
   return (
+    <footer className="bg-gradient-to-b from-[#0b0f19] to-black text-gray-400 mt-20 border-t border-gray-800">
 
-    <footer className="bg-black text-gray-400 mt-24 relative">
-
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14">
 
         {/* GRID */}
-        <div className="grid md:grid-cols-4 gap-10">
+        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
 
           {/* BRAND */}
-          <div>
-
-            <h3 className="text-white text-lg font-semibold mb-3">
-              MockAPIs
+          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={0}>
+            <h3 className="text-white text-xl font-bold mb-3">
+              DevUtilities Lab 🚀
             </h3>
 
             <p className="text-sm leading-relaxed">
-              MockAPIs provides free developer tools and mock APIs to help
-              developers test, format, convert, and debug data quickly.
-              All tools run directly in the browser with no installation required.
+              Free developer tools to build faster ⚡  
+              Mock APIs • JSON Tools • Converters • Compilers  
             </p>
 
-          </div>
+            {/* SOCIAL */}
+            <div className="flex gap-3 mt-5">
 
+              {[{
+                icon: <Globe size={18} />,
+                href: "https://devutilitieslab.com"
+              },{
+                icon: <Send size={18} />,
+                href: "https://t.me/devutilities_lab",
+                extra: "hover:bg-[#229ED9]/20"
+              },{
+                icon: <FaGithub size={16} />,
+                href: "https://github.com/devutilitieslab"
+              },{
+                icon: <FaLinkedin size={16} />,
+                href: "https://linkedin.com/company/devutilitieslab",
+                extra: "hover:bg-[#0A66C2]/20"
+              },{
+                icon: <FaFacebook size={16} />,
+                href: "https://facebook.com/devutilitieslab",
+                extra: "hover:bg-[#1877F2]/20"
+              }].map((item, i) => (
+                <motion.a
+                  key={i}
+                  href={item.href}
+                  target="_blank"
+                  whileHover={{ scale: 1.15, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`icon transition-all duration-300 ${item.extra || ""}`}
+                >
+                  {item.icon}
+                </motion.a>
+              ))}
+
+            </div>
+          </motion.div>
+
+          {/* LINKS */}
+          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={1}>
+            <h3 className="text-white font-semibold mb-3">Tools</h3>
+            <ul className="space-y-2 text-sm">
+              <li><Link className="hover:text-white transition" href="/tools">All Tools</Link></li>
+              <li><Link className="hover:text-white transition" href="/mock-api">Mock APIs</Link></li>
+              <li><Link className="hover:text-white transition" href="/json-tools">JSON Tools</Link></li>
+            </ul>
+          </motion.div>
 
           {/* RESOURCES */}
-          <div>
-
-            <h3 className="text-white text-lg font-semibold mb-3">
-              Resources
-            </h3>
-
+          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={2}>
+            <h3 className="text-white text-sm font-semibold mb-3 uppercase">Resources</h3>
             <ul className="space-y-2 text-sm">
-
-              <li>
-                <Link href="/docs" className="hover:text-white transition">
-                  Documentation
-                </Link>
-              </li>
-
-              <li>
-                <Link href="/apis" className="hover:text-white transition">
-                  API List
-                </Link>
-              </li>
-
-              <li>
-                <Link href="/playground" className="hover:text-white transition">
-                  API Playground
-                </Link>
-              </li>
-
-              <li>
-                <Link href="/learn" className="hover:text-white transition">
-                  Learn APIs
-                </Link>
-              </li>
-
-              <li>
-                <Link href="/tools" className="hover:text-white transition">
-                  Developer Tools
-                </Link>
-              </li>
-
+              <li><Link className="hover:text-white transition" href="/blog">Blog</Link></li>
+              <li><Link className="hover:text-white transition" href="/docs">Documentation</Link></li>
+              <li><Link className="hover:text-white transition" href="/learn">Learn</Link></li>
             </ul>
+          </motion.div>
 
-          </div>
-
-
-          {/* TOOL CATEGORIES */}
-          <div>
-
-            <h3 className="text-white text-lg font-semibold mb-3">
-              Tool Categories
-            </h3>
-
+          {/* LEGAL */}
+          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={3}>
+            <h3 className="text-white text-sm font-semibold mb-3 uppercase">Legal</h3>
             <ul className="space-y-2 text-sm">
-
-              <li>
-                <Link href="/tools/category/json" className="hover:text-white transition">
-                  JSON Tools
-                </Link>
-              </li>
-
-              <li>
-                <Link href="/tools/category/encoding" className="hover:text-white transition">
-                  Encoding Tools
-                </Link>
-              </li>
-
-              <li>
-                <Link href="/tools/category/developer" className="hover:text-white transition">
-                  Developer Utilities
-                </Link>
-              </li>
-
-              <li>
-                <Link href="/tools/category/formatter" className="hover:text-white transition">
-                  Code Formatters
-                </Link>
-              </li>
-
-              <li>
-                <Link href="/tools/category/text" className="hover:text-white transition">
-                  Text Tools
-                </Link>
-              </li>
-
+              <li><Link className="hover:text-white transition" href="/about">About</Link></li>
+              <li><Link className="hover:text-white transition" href="/contact">Contact</Link></li>
+              <li><Link className="hover:text-white transition" href="/privacy-policy">Privacy Policy</Link></li>
+              <li><Link className="hover:text-white transition" href="/terms">Terms & Conditions</Link></li>
+              <li><Link className="hover:text-white transition" href="/disclaimer">Disclaimer</Link></li>
+              <li><Link className="hover:text-white transition" href="/cookie-policy">Cookie Policy</Link></li>
             </ul>
+          </motion.div>
 
-          </div>
+        </div>
 
+        {/* CTA */}
+        <motion.div
+          className="mt-14"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+        >
+          <div className="relative bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-gray-800 rounded-xl p-6 text-center backdrop-blur overflow-hidden">
 
-          {/* SUPPORT */}
-          <div className="relative">
+            {/* subtle glow */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-2xl opacity-40" />
 
-            <h3 className="text-white text-lg font-semibold mb-3">
-              Support
-            </h3>
+            <h4 className="relative text-white text-lg font-semibold mb-2">
+              🚀 Build Faster with DevUtilities
+            </h4>
 
-            <p className="text-sm mb-4">
-              If MockAPIs helps your development workflow,
-              consider supporting the project.
+            <p className="relative text-sm text-gray-400 mb-4">
+              Free tools. No login. Built for developers.
             </p>
 
-            {/* SUPPORT BUTTON */}
-            <button
-    onClick={() => setOpen(!open)}
-    className="bg-yellow-500 hover:bg-yellow-400 transition text-black font-medium px-4 py-2 rounded"
-  >
-    🎁 Support Project
-  </button>
+            <div className="relative flex flex-col sm:flex-row justify-center gap-3">
 
-  {/* QR POPUP */}
-  {open && (
+              <motion.a
+                href="/"
+                whileHover={{ scale: 1.05 }}
+                className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg text-sm shadow"
+              >
+                Explore Tools
+              </motion.a>
 
-    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 w-[280px] bg-white text-black rounded-lg shadow-xl p-5 z-50">
+              <motion.a
+                href="https://t.me/devutilities_lab"
+                target="_blank"
+                whileHover={{ scale: 1.05 }}
+                className="border border-gray-600 hover:border-white px-5 py-2 rounded-lg text-sm"
+              >
+                Join Telegram
+              </motion.a>
 
-      <h4 className="font-semibold mb-2 text-sm">
-        Support this project ☕
-      </h4>
-
-      <p className="text-xs text-gray-600 mb-3">
-        If MockAPIs helped you, consider buying me a coffee.
-      </p>
-
-      <div className="flex justify-center">
-
-        <Image
-          src="/coffee-qr.png"
-          alt="Support QR"
-          width={180}
-          height={180}
-        />
-
-      </div>
-
-      <p className="text-xs text-gray-500 text-center mt-3">
-        Thank you for supporting open tools ❤️
-      </p>
-
-    </div>
-
-  )}
-
-
+            </div>
           </div>
+        </motion.div>
 
+        {/* EMAIL */}
+        <div className="text-center text-sm text-gray-500 mt-10">
+          hello@devutilitieslab.com
         </div>
-
-
-        {/* COMPLIANCE LINKS */}
-        <div className="flex flex-wrap justify-center gap-6 mt-14 text-sm">
-
-          <Link href="/about" className="hover:text-white transition">
-            About
-          </Link>
-
-          <Link href="/contact" className="hover:text-white transition">
-            Contact
-          </Link>
-
-          <Link href="/privacy-policy" className="hover:text-white transition">
-            Privacy Policy
-          </Link>
-
-          <Link href="/terms" className="hover:text-white transition">
-            Terms of Service
-          </Link>
-
-          <Link href="/disclaimer" className="hover:text-white transition">
-            Disclaimer
-          </Link>
-
-        </div>
-
-
-        {/* CONTACT EMAIL */}
-        <div className="text-center text-sm text-gray-500 mt-6">
-
-          Contact: support@mockapis.in
-
-        </div>
-
 
         {/* COPYRIGHT */}
-        <div className="border-t border-gray-800 mt-10 pt-6 text-center text-sm text-gray-500">
-
-          © {new Date().getFullYear()} MockAPIs — Built with ❤️ for developers.
-          Free tools to simplify development workflows worldwide.
-
+        <div className="border-t border-gray-800 mt-8 pt-6 text-center text-sm text-gray-500">
+          © {new Date().getFullYear()} DevUtilities Lab 🚀
         </div>
 
       </div>
-
     </footer>
-
   )
-
 }
