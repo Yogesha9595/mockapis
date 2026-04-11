@@ -6,32 +6,41 @@ import { convertUnit } from "@/lib/converterEngine"
 import { units } from "@/data/units"
 import { unitCategories } from "@/data/unitCategories"
 
+type UnitCategory = keyof typeof units
+
 export default function UnitConverterPage() {
-  const [category, setCategory] = useState("length")
+  const [category, setCategory] = useState<UnitCategory>("length")
   const [value, setValue] = useState(1)
   const [from, setFrom] = useState("meter")
   const [to, setTo] = useState("kilometer")
   const [result, setResult] = useState(0)
   const [copied, setCopied] = useState(false)
 
+  // ✅ FIXED: proper ternary + typing
   const currentUnits =
     category === "temperature"
       ? ["celsius", "fahrenheit", "kelvin"]
-      Object.keys(units[category as keyof typeof units] || {})
+      : Object.keys(units[category] || {})
 
   useEffect(() => {
     if (!from || !to) return
-    const res = convertUnit({ category, value, from, to })
-    setResult(Number(res.toFixed(6)))
+
+    try {
+      const res = convertUnit({ category, value, from, to })
+      setResult(Number(res.toFixed(6)))
+    } catch (err) {
+      console.error("Conversion error:", err)
+    }
   }, [category, value, from, to])
 
   const handleCategoryChange = (newCategory: string) => {
-    setCategory(newCategory)
+    const safeCategory = newCategory as UnitCategory
+    setCategory(safeCategory)
 
     const unitList =
-      newCategory === "temperature"
+      safeCategory === "temperature"
         ? ["celsius", "fahrenheit", "kelvin"]
-        : Object.keys(units[newCategory])
+        : Object.keys(units[safeCategory] || {})
 
     setFrom(unitList[0])
     setTo(unitList[1] || unitList[0])
@@ -43,16 +52,19 @@ export default function UnitConverterPage() {
   }
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(String(result))
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
+    try {
+      await navigator.clipboard.writeText(String(result))
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch (err) {
+      console.error("Copy failed:", err)
+    }
   }
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-3xl mx-auto">
 
-        {/* 🔥 SEO Heading */}
         <h1 className="text-3xl font-bold text-center mb-2">
           Free Unit Converter Tool
         </h1>
@@ -60,7 +72,6 @@ export default function UnitConverterPage() {
           Convert length, weight, temperature, data and more instantly.
         </p>
 
-        {/* Card */}
         <div className="bg-white shadow-lg rounded-2xl p-6 space-y-6">
 
           {/* Category */}
@@ -143,40 +154,29 @@ export default function UnitConverterPage() {
 
         </div>
 
-        {/* 🔥 SEO INTERNAL LINKS (VERY IMPORTANT) */}
+        {/* SEO LINKS */}
         <div className="mt-10">
-
           <h2 className="text-lg font-semibold mb-4">
             Popular Conversions
           </h2>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-blue-600">
-
             <Link href="/convert/meter-to-kilometer">meter → kilometer</Link>
             <Link href="/convert/km-to-mile">km → mile</Link>
             <Link href="/convert/kg-to-pound">kg → pound</Link>
             <Link href="/convert/mb-to-gb">mb → gb</Link>
             <Link href="/convert/mph-to-km-h">mph → km/h</Link>
             <Link href="/convert/celsius-to-fahrenheit">°C → °F</Link>
-
           </div>
-
         </div>
 
-        {/* 🔥 SEO CONTENT BLOCK */}
+        {/* SEO CONTENT */}
         <div className="mt-10 text-gray-600 text-sm leading-6">
           <h2 className="font-semibold mb-2">About This Tool</h2>
           <p>
             This free online unit converter helps you convert between different
-            measurement units quickly and accurately. Whether you need to convert
-            kilometers to meters, kilograms to pounds, or Celsius to Fahrenheit,
-            this tool provides instant results.
+            measurement units quickly and accurately.
           </p>
-        </div>
-
-        {/* 💰 Monetization */}
-        <div className="mt-10 text-center text-gray-400 text-sm">
-          Ad Space (Google AdSense / Affiliate Tools)
         </div>
 
       </div>
