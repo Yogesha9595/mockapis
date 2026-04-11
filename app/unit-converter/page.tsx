@@ -16,11 +16,17 @@ export default function UnitConverterPage() {
   const [result, setResult] = useState(0)
   const [copied, setCopied] = useState(false)
 
-  // ✅ FIXED: proper ternary + typing
-  const currentUnits =
-    category === "temperature"
-      ? ["celsius", "fahrenheit", "kelvin"]
-      : Object.keys(units[category] || {})
+  // ✅ SAFE + TYPE CORRECT
+  const getUnits = (cat: UnitCategory): string[] => {
+    if (cat === "temperature") {
+      return ["celsius", "fahrenheit", "kelvin"]
+    }
+
+    const safeCategory = cat as keyof typeof units
+    return Object.keys(units[safeCategory] || {})
+  }
+
+  const currentUnits = getUnits(category)
 
   useEffect(() => {
     if (!from || !to) return
@@ -37,10 +43,7 @@ export default function UnitConverterPage() {
     const safeCategory = newCategory as UnitCategory
     setCategory(safeCategory)
 
-    const unitList =
-      safeCategory === "temperature"
-        ? ["celsius", "fahrenheit", "kelvin"]
-        : Object.keys(units[safeCategory] || {})
+    const unitList = getUnits(safeCategory)
 
     setFrom(unitList[0])
     setTo(unitList[1] || unitList[0])
