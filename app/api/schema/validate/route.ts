@@ -3,15 +3,23 @@ import {
   extractSchemaFromHTML,
 } from "@/lib/tools/schemaValidator"
 
-// Optional: Edge runtime (good for Cloudflare / Vercel)
 export const runtime = "edge"
+
+// ✅ TYPE (FIXES YOUR ERROR PROPERLY)
+type SchemaValidationResult = {
+  valid: boolean
+  error?: string
+  score?: number
+}
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
     const { input, mode } = body || {}
 
-    // ✅ Basic validation
+    // ============================
+    // ✅ INPUT VALIDATION
+    // ============================
     if (!input || typeof input !== "string") {
       return Response.json(
         {
@@ -28,7 +36,6 @@ export async function POST(req: Request) {
     // 🌐 URL MODE
     // ============================
     if (mode === "url") {
-      // Validate URL format
       let url: URL
 
       try {
@@ -44,7 +51,6 @@ export async function POST(req: Request) {
       }
 
       try {
-        // Timeout controller (important)
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), 8000)
 
@@ -69,7 +75,6 @@ export async function POST(req: Request) {
         }
 
         const html = await res.text()
-
         schemas = extractSchemaFromHTML(html)
 
         if (!schemas.length) {
@@ -95,8 +100,6 @@ export async function POST(req: Request) {
     else {
       try {
         const parsed = JSON.parse(input)
-
-        // Handle array or single object
         schemas = Array.isArray(parsed) ? parsed : [parsed]
       } catch {
         return Response.json(
@@ -112,10 +115,10 @@ export async function POST(req: Request) {
     // ============================
     // ✅ VALIDATION
     // ============================
-    const results = schemas
+    const results: SchemaValidationResult[] = schemas
       .map((schema) => {
         try {
-          return validateSchema(schema)
+          return validateSchema(schema) as SchemaValidationResult
         } catch {
           return {
             valid: false,
@@ -134,10 +137,10 @@ export async function POST(req: Request) {
     }
 
     // ============================
-    // 📊 SCORE CALCULATION
+    // 📊 SCORE CALCULATION (FIXED)
     // ============================
     const totalScore =
-      results.reduce((sum, r) => sum + (r.score || 0), 0) /
+      results.reduce((sum, r) => sum + (r?.score ?? 0), 0) /
       results.length
 
     // ============================
