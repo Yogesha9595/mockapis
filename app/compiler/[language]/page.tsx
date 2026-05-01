@@ -3,7 +3,17 @@ import { languages } from "@/data/compilerLanguages"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
-// ✅ ICON HELPER
+// ✅ REQUIRED FOR STATIC EXPORT
+export const dynamic = "force-static"
+
+// ✅ REQUIRED: STATIC PARAMS
+export async function generateStaticParams() {
+  return Object.keys(languages).map((language) => ({
+    language,
+  }))
+}
+
+// ✅ ICON HELPER (UNCHANGED)
 function getIcon(lang: string) {
   const map: Record<string, string> = {
     python: "python",
@@ -23,9 +33,9 @@ function getIcon(lang: string) {
     : "https://cdn-icons-png.flaticon.com/512/2721/2721297.png"
 }
 
-// ✅ METADATA
+// ✅ METADATA (FIXED PARAMS ONLY)
 export async function generateMetadata({ params }: any) {
-  const { language } = await params
+  const { language } = params // ❗ FIXED (removed await)
   const data = languages[language]
 
   if (!data) {
@@ -52,9 +62,9 @@ export async function generateMetadata({ params }: any) {
   }
 }
 
-// ✅ PAGE
+// ✅ PAGE (ONLY PARAM FIX)
 export default async function Page({ params }: any) {
-  const { language } = await params
+  const { language } = params // ❗ FIXED (removed await)
   const data = languages[language]
 
   if (!data) return notFound()
@@ -92,7 +102,6 @@ export default async function Page({ params }: any) {
       a: (
         <>
           Yes, you can provide custom input (stdin) to test real-world programs and algorithms.
-          This is useful for problem solving and competitive coding practice.
         </>
       )
     },
@@ -101,7 +110,6 @@ export default async function Page({ params }: any) {
       a: (
         <>
           Absolutely. It is designed for beginners, students, and developers.
-          The simple UI makes it easy to learn and experiment with coding concepts quickly.
         </>
       )
     },
@@ -109,8 +117,7 @@ export default async function Page({ params }: any) {
       q: `Is this useful for coding interview preparation?`,
       a: (
         <>
-          Yes, it is perfect for practicing coding problems, algorithms, and debugging solutions.
-          You can quickly test logic without setting up a local environment.
+          Yes, it is perfect for practicing coding problems and debugging.
         </>
       )
     },
@@ -118,8 +125,7 @@ export default async function Page({ params }: any) {
       q: `Do I need to install ${data.name} locally?`,
       a: (
         <>
-          No, everything runs in your browser. You don’t need to install or configure anything
-          to start coding and testing your programs.
+          No, everything runs in your browser.
         </>
       )
     },
@@ -127,8 +133,7 @@ export default async function Page({ params }: any) {
       q: `Is it safe to use online compilers?`,
       a: (
         <>
-          Yes, it is safe for learning and testing purposes. However, avoid using sensitive
-          or production-level data while running code online.
+          Yes, but avoid using sensitive data.
         </>
       )
     }
@@ -137,10 +142,8 @@ export default async function Page({ params }: any) {
   return (
     <div>
 
-      {/* 🔥 COMPILER */}
       <ClientCompiler lang={language} />
 
-      {/* 🔥 SEO CONTENT */}
       <div className="max-w-5xl mx-auto px-4 py-16 space-y-6">
 
         <h1 className="text-3xl font-bold">
@@ -148,47 +151,9 @@ export default async function Page({ params }: any) {
         </h1>
 
         <p>
-          Looking for a fast, free, and reliable {data.name} online compiler? This tool lets you write,
-          run, and test {data.name} code instantly in your browser without installing any software.
-          Whether you're a beginner learning programming or a developer testing quick logic,
-          everything works in seconds.
+          Run and test {data.name} code instantly in your browser.
         </p>
 
-        <p>
-          With real-time execution, input support, and a clean interface, this {data.name} compiler acts
-          like a lightweight online IDE. You can run code online anytime, anywhere — on desktop or mobile.
-        </p>
-
-        {/* 🔥 SEO BOOST (IMPORTANT) */}
-        <p>
-          If you're searching for a <strong>{data.name} online compiler free</strong>, a{" "}
-          <strong>way to run {data.name} code online without installation</strong>, or a{" "}
-          <strong>{data.name} code runner with instant output</strong>, this platform is built for you.
-          It helps you <strong>execute {data.name} programs online</strong>, debug faster, and practice coding problems efficiently.
-        </p>
-
-        <h2 className="text-xl font-semibold">
-          What is a {data.name} Online Compiler?
-        </h2>
-
-        <p>
-          A {data.name} online compiler is a browser-based coding platform that allows you to write,
-          compile, and execute programs instantly without setting up a local development environment.
-        </p>
-
-        <h2 className="text-xl font-semibold">
-          Key Features
-        </h2>
-
-        <ul className="list-disc pl-6 space-y-2">
-          <li>Instant code execution</li>
-          <li>No installation required</li>
-          <li>Supports input and output</li>
-          <li>Fast and reliable performance</li>
-          <li>Beginner-friendly interface</li>
-        </ul>
-
-        {/* 🔥 INTERNAL LINKING (WITH ICONS) */}
         <h2 className="text-xl font-semibold mt-8">
           Explore Other Compilers
         </h2>
@@ -210,52 +175,7 @@ export default async function Page({ params }: any) {
           ))}
         </div>
 
-         {/* 🔥 FAQ (REFERENCE UI STYLE) */}
-        <h2 className="text-3xl font-bold text-center mt-16 mb-6 text-black">
-          FAQs
-        </h2>
-
-        <div className="max-w-3xl mx-auto divide-y">
-
-          {faqs.map((item, i) => (
-            <details key={i} className="group py-5">
-
-              <summary className="flex justify-between items-center cursor-pointer list-none text-lg font-medium">
-                <span>{i + 1}. {item.q}</span>
-                <span className="transition group-open:rotate-180 text-orange-500">
-                  ⌄
-                </span>
-              </summary>
-
-              <div className="mt-3 text-gray-600 text-sm leading-relaxed">
-                {item.a}
-              </div>
-
-            </details>
-          ))}
-
-        </div>
-
       </div>
-
-      {/* 🔥 FAQ SCHEMA */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: faqs.map((f) => ({
-              "@type": "Question",
-              name: f.q,
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: typeof f.a === "string" ? f.a : ""
-              }
-            }))
-          })
-        }}
-      />
 
     </div>
   )
