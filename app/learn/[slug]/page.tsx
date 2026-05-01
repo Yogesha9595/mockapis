@@ -6,13 +6,31 @@ import { compileMDX } from "next-mdx-remote/rsc"
 import ArticleLayout from "@/components/ArticleLayout"
 import TableOfContents from "@/components/TableOfContents"
 
+// ✅ REQUIRED FOR STATIC EXPORT
+export const dynamic = "force-static"
+
+// ✅ GENERATE STATIC PATHS FROM MDX FILES
+export async function generateStaticParams() {
+  const contentDir = path.join(process.cwd(), "content")
+
+  if (!fs.existsSync(contentDir)) return []
+
+  const files = fs.readdirSync(contentDir)
+
+  return files
+    .filter((file) => file.endsWith(".mdx"))
+    .map((file) => ({
+      slug: file.replace(".mdx", ""),
+    }))
+}
+
 type Params = {
-  params: Promise<{ slug: string }>
+  params: { slug: string } // ✅ FIXED
 }
 
 /* ---------------- METADATA ---------------- */
 export async function generateMetadata({ params }: Params) {
-  const { slug } = await params
+  const { slug } = params // ✅ FIXED (no await)
 
   try {
     const filePath = path.join(process.cwd(), "content", `${slug}.mdx`)
@@ -44,7 +62,7 @@ export async function generateMetadata({ params }: Params) {
 
 /* ---------------- PAGE ---------------- */
 export default async function ArticlePage({ params }: Params) {
-  const { slug } = await params
+  const { slug } = params // ✅ FIXED (no await)
 
   const filePath = path.join(process.cwd(), "content", `${slug}.mdx`)
 
