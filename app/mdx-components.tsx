@@ -1,8 +1,8 @@
 import type { MDXComponents } from "mdx/types"
-import CodeBlock from "./components/CodeBlock"
+import CodeBlock from "@/components/CodeBlock" // ✅ FIXED PATH
 
 /* ✅ Helper: slug generator (robust) */
-function slugify(text: any) {
+function slugify(text: unknown) {
   if (!text) return ""
   return String(text)
     .toLowerCase()
@@ -44,10 +44,7 @@ export function useMDXComponents(
     /* ---------------- TEXT ---------------- */
 
     p: (props) => (
-      <p
-        className="text-gray-700 leading-7 mb-5 text-[17px]"
-        {...props}
-      />
+      <p className="text-gray-700 leading-7 mb-5 text-[17px]" {...props} />
     ),
 
     ul: (props) => (
@@ -76,25 +73,30 @@ export function useMDXComponents(
 
     /* ---------------- INLINE CODE ---------------- */
 
-    code: ({ children, ...props }: any) => {
-      return (
-        <code
-          className="bg-gray-100 px-1.5 py-0.5 rounded text-sm text-pink-600"
-          {...props}
-        >
-          {children}
-        </code>
-      )
-    },
+    code: ({ children, ...props }: { children: React.ReactNode }) => (
+      <code
+        className="bg-gray-100 px-1.5 py-0.5 rounded text-sm text-pink-600"
+        {...props}
+      >
+        {children}
+      </code>
+    ),
 
     /* ---------------- CODE BLOCK ---------------- */
 
     pre: (props: any) => {
-      const code = props.children?.props?.children || ""
-      const className = props.children?.props?.className || ""
+      const child = props.children
 
-      // Extract language from className: language-js
-      const language = className.replace("language-", "") || "code"
+      const code =
+        typeof child?.props?.children === "string"
+          ? child.props.children
+          : ""
+
+      const className = child?.props?.className || ""
+
+      const language = className.startsWith("language-")
+        ? className.replace("language-", "")
+        : "code"
 
       return <CodeBlock language={language}>{code}</CodeBlock>
     },
@@ -118,10 +120,7 @@ export function useMDXComponents(
     /* ---------------- IMAGE ---------------- */
 
     img: (props) => (
-      <img
-        className="rounded-lg my-6 shadow-sm"
-        {...props}
-      />
+      <img className="rounded-lg my-6 shadow-sm" {...props} />
     ),
 
     ...components,

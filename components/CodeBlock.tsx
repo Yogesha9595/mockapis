@@ -3,7 +3,7 @@
 import { useState } from "react"
 
 type Props = {
-  children: string
+  children: React.ReactNode
   language?: string
 }
 
@@ -13,9 +13,16 @@ export default function CodeBlock({
 }: Props) {
   const [copied, setCopied] = useState(false)
 
+  // ✅ Safe text extraction
+  const getText = () => {
+    if (typeof children === "string") return children.trim()
+    if (Array.isArray(children)) return children.join("").trim()
+    return String(children)
+  }
+
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(children.trim())
+      await navigator.clipboard.writeText(getText())
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
@@ -37,6 +44,7 @@ export default function CodeBlock({
         {/* Copy Button */}
         <button
           onClick={handleCopy}
+          aria-label="Copy code"
           className="px-3 py-1 rounded-md bg-white border text-gray-600 hover:bg-gray-50 transition text-xs"
         >
           {copied ? "Copied ✓" : "Copy"}
@@ -46,7 +54,7 @@ export default function CodeBlock({
 
       {/* Code */}
       <pre className="bg-[#0f172a] text-gray-200 p-4 overflow-x-auto text-sm leading-relaxed">
-        <code className="font-mono">
+        <code className="font-mono whitespace-pre">
           {children}
         </code>
       </pre>
