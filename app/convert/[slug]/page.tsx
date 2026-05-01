@@ -2,6 +2,9 @@ import Link from "next/link"
 import { units } from "@/data/units"
 import { convertUnit } from "@/lib/converterEngine"
 
+// ✅ derive type from units (NO external file needed)
+type UnitCategory = keyof typeof units
+
 type PageProps = {
   params: {
     slug: string
@@ -11,12 +14,35 @@ type PageProps = {
   }
 }
 
-// ✅ Helper: safe slug parsing
-function parseSlug(slug: string) {
+// ✅ Safe slug parsing
+function parseSlug(slug: string): { from: string; to: string } | null {
   if (!slug.includes("-to-")) return null
+
   const [from, to] = slug.split("-to-")
   if (!from || !to) return null
-  return { from, to }
+
+  return {
+    from: from.toLowerCase(),
+    to: to.toLowerCase(),
+  }
+}
+
+// ✅ Detect category safely
+function getCategory(
+  from: string,
+  to: string
+): UnitCategory | null {
+  for (const key in units) {
+    const typedKey = key as UnitCategory
+    const group = units[typedKey]
+
+    if (group && typeof group === "object") {
+      if (from in group && to in group) {
+        return typedKey
+      }
+    }
+  }
+  return null
 }
 
 // 🔥 SEO Metadata
@@ -34,11 +60,14 @@ export function generateMetadata({ params }: PageProps) {
 
   return {
     title: `${from} to ${to} Converter – Free Online Tool`,
-    description: `Convert ${from} to ${to} instantly using our free online unit converter. Fast, accurate and easy to use.`,
+    description: `Convert ${from} to ${to} instantly using our free online unit converter.`,
   }
 }
 
-export default function ConvertPage({ params, searchParams }: PageProps) {
+export default function ConvertPage({
+  params,
+  searchParams,
+}: PageProps) {
   const parsed = parseSlug(params.slug)
 
   if (!parsed) {
@@ -53,26 +82,12 @@ export default function ConvertPage({ params, searchParams }: PageProps) {
 
   const { from: fromUnit, to: toUnit } = parsed
 
+  // ✅ Safe number parsing
   const inputValue = Number(searchParams?.value ?? 1)
+  const safeValue = isNaN(inputValue) ? 1 : inputValue
 
-  let category: string | null = null
+  const category = getCategory(fromUnit, toUnit)
 
-  // 🔍 detect category safely
-  for (const key in units) {
-    const group = units[key as keyof typeof units]
-
-    if (
-      group &&
-      typeof group === "object" &&
-      fromUnit in group &&
-      toUnit in group
-    ) {
-      category = key
-      break
-    }
-  }
-
-  // ❌ invalid case
   if (!category) {
     return (
       <div className="py-20 text-center">
@@ -83,29 +98,27 @@ export default function ConvertPage({ params, searchParams }: PageProps) {
     )
   }
 
-  // ✅ conversion
-const result = convertUnit({
-  category: category as UnitCategory,
-  value: inputValue,
-  from: fromUnit,
-  to: toUnit,
-})
+  // ✅ SAFE conversion (no type error now)
+  const result = convertUnit({
+    category,
+    value: safeValue,
+    from: fromUnit,
+    to: toUnit,
+  })
 
   const formattedResult = Number(result.toFixed(6))
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
 
-      {/* 🔥 SEO Heading */}
       <h1 className="text-3xl font-bold mb-6 capitalize">
-        {inputValue} {fromUnit} to {toUnit}
+        {safeValue} {fromUnit} to {toUnit}
       </h1>
 
       <div className="border rounded-xl p-6 bg-white shadow-sm space-y-4">
 
-        {/* ✅ Result */}
         <p className="text-lg">
-          <span className="font-semibold">{inputValue}</span> {fromUnit}
+          <span className="font-semibold">{safeValue}</span> {fromUnit}
           {" = "}
           <span className="font-semibold text-blue-600">
             {formattedResult}
@@ -113,35 +126,29 @@ const result = convertUnit({
           {toUnit}
         </p>
 
-        {/* 🔗 Input → reload page (SEO trick) */}
         <form method="GET">
           <input
             type="number"
             name="value"
-            defaultValue={inputValue}
+            defaultValue={safeValue}
             className="border p-3 rounded w-full"
             placeholder={`Enter ${fromUnit}`}
           />
         </form>
 
-        {/* 🔥 SEO CONTENT BLOCK (VERY IMPORTANT) */}
         <div className="text-gray-600 text-sm leading-6 space-y-2">
           <p>
-            Use this free online tool to convert <strong>{fromUnit}</strong> to{" "}
-            <strong>{toUnit}</strong> quickly and accurately.
+            Convert <strong>{fromUnit}</strong> to{" "}
+            <strong>{toUnit}</strong> instantly using our free tool.
           </p>
           <p>
-            Enter any value to instantly get the converted result. This converter
-            supports multiple unit categories including length, weight,
-            temperature, speed, and data.
+            Supports length, weight, temperature, speed, and data conversions.
           </p>
         </div>
 
       </div>
 
-      {/* 🔥 INTERNAL LINKS (SEO BOOST) */}
       <div className="mt-10">
-
         <h2 className="text-lg font-semibold mb-4">
           Related Conversions
         </h2>
@@ -161,10 +168,8 @@ const result = convertUnit({
           </Link>
 
         </div>
-
       </div>
 
-      {/* 💰 Monetization */}
       <div className="mt-12 text-center text-gray-400">
         Ad Space
       </div>
