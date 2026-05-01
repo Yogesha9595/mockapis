@@ -1,17 +1,29 @@
 import { units } from "@/data/units"
 import Link from "next/link"
 
+// ✅ REQUIRED FOR STATIC EXPORT
+export const dynamic = "force-static"
+
+// ✅ GENERATE STATIC PARAMS
+export async function generateStaticParams() {
+  return Object.keys(units).map((category) => ({
+    category,
+  }))
+}
+
 type PageProps = {
   params: {
     category: string
   }
 }
 
-// 🔥 SEO metadata
+// 🔥 SEO metadata (safe)
 export function generateMetadata({ params }: PageProps) {
+  const category = params.category || "converter"
+
   return {
-    title: `${params.category} Converter – Free Online Tool`,
-    description: `Convert ${params.category} units instantly using our free online converter.`,
+    title: `${category} Converter – Free Online Tool`,
+    description: `Convert ${category} units instantly using our free online converter.`,
   }
 }
 
@@ -23,6 +35,7 @@ export default function ConverterCategoryPage({ params }: PageProps) {
       ? ["celsius", "fahrenheit", "kelvin"]
       : units[category as keyof typeof units]
 
+  // ✅ fail-safe guard
   if (!categoryUnits) {
     return (
       <div className="py-20 text-center">
@@ -65,7 +78,7 @@ export default function ConverterCategoryPage({ params }: PageProps) {
 
       </div>
 
-      {/* 🔥 SEO GOLD — internal links */}
+      {/* 🔥 SEO LINKS */}
       <div className="mt-10">
 
         <h2 className="text-lg font-semibold mb-4">
