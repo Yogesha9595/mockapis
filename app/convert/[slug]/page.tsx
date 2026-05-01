@@ -84,12 +84,12 @@ export default function ConvertPage({ params, searchParams }: PageProps) {
   }
 
   // ✅ conversion
-  const result = convertUnit({
-    category,
-    value: inputValue,
-    from: fromUnit,
-    to: toUnit,
-  })
+const result = convertUnit({
+  category: category as UnitCategory,
+  value: inputValue,
+  from: fromUnit,
+  to: toUnit,
+})
 
   const formattedResult = Number(result.toFixed(6))
 
