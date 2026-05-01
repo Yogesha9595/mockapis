@@ -1,62 +1,79 @@
+import type { MetadataRoute } from "next"
 import fs from "fs"
 import path from "path"
 import { units } from "@/data/units"
 
-export default function sitemap() {
+// ✅ REQUIRED for static export
+export const dynamic = "force-static"
+
+export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://mockapis.in"
 
-  const urls: any[] = []
+  const urls: MetadataRoute.Sitemap = []
 
-  // ✅ Static pages
+  const now = new Date()
+
+  /* ---------------- STATIC PAGES ---------------- */
+
   const staticRoutes = ["", "/learn", "/unit-converter"]
 
   staticRoutes.forEach((route) => {
     urls.push({
       url: `${baseUrl}${route}`,
-      lastModified: new Date(),
+      lastModified: now,
     })
   })
 
-  // ✅ Learn (MDX)
-  const contentDir = path.join(process.cwd(), "content")
+  /* ---------------- MDX CONTENT ---------------- */
 
-  const files = fs.existsSync(contentDir)
-    ? fs.readdirSync(contentDir)
-    : []
+  try {
+    const contentDir = path.join(process.cwd(), "content")
 
-  files
-    .filter((file) => file.endsWith(".mdx"))
-    .forEach((file) => {
-      urls.push({
-        url: `${baseUrl}/learn/${file.replace(".mdx", "")}`,
-        lastModified: new Date(),
-      })
-    })
+    if (fs.existsSync(contentDir)) {
+      const files = fs.readdirSync(contentDir)
 
-  // ✅ Category pages
-  for (const category in units) {
-    urls.push({
-      url: `${baseUrl}/converters/${category}`,
-      lastModified: new Date(),
-    })
+      files
+        .filter((file) => file.endsWith(".mdx"))
+        .forEach((file) => {
+          urls.push({
+            url: `${baseUrl}/learn/${file.replace(".mdx", "")}`,
+            lastModified: now,
+          })
+        })
+    }
+  } catch {
+    // ✅ fail-safe (important for build)
   }
 
-  // 🔥 Conversion pages (MOST IMPORTANT)
-  for (const category in units) {
+  /* ---------------- CATEGORY PAGES ---------------- */
+
+  Object.keys(units).forEach((category) => {
+    urls.push({
+      url: `${baseUrl}/converters/${category}`,
+      lastModified: now,
+    })
+  })
+
+  /* ---------------- CONVERSION PAGES ---------------- */
+
+  Object.keys(units).forEach((category) => {
     const group = units[category as keyof typeof units]
+
+    if (!group || typeof group !== "object") return
+
     const unitList = Object.keys(group)
 
-    for (const from of unitList) {
-      for (const to of unitList) {
-        if (from === to) continue
+    unitList.forEach((from) => {
+      unitList.forEach((to) => {
+        if (from === to) return
 
         urls.push({
           url: `${baseUrl}/convert/${from}-to-${to}`,
-          lastModified: new Date(),
+          lastModified: now,
         })
-      }
-    }
-  }
+      })
+    })
+  })
 
   return urls
 }
