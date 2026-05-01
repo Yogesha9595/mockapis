@@ -19,8 +19,33 @@ import {
   YAxis,
 } from "recharts";
 
-// 🔥 ENGINE SAFE RUNNER
-function runEngine(engine: string, values: any) {
+/* ---------------- TYPES ---------------- */
+
+// ✅ Strict result type
+type LoanResult = {
+  emi: number;
+  totalPayment: number;
+  totalInterest: number;
+  schedule: any[];
+};
+
+type SimpleResult = { result: number };
+
+type CalcResult = LoanResult | SimpleResult | Record<string, never>;
+
+// ✅ TYPE GUARD (CRITICAL FIX)
+function isLoanResult(result: any): result is LoanResult {
+  return (
+    result &&
+    typeof result === "object" &&
+    "totalPayment" in result &&
+    "totalInterest" in result
+  );
+}
+
+/* ---------------- ENGINE ---------------- */
+
+function runEngine(engine: string, values: any): CalcResult {
   try {
     switch (engine) {
       case "loan":
@@ -39,12 +64,14 @@ function runEngine(engine: string, values: any) {
   }
 }
 
-// 🔥 SAFE NUMBER
+/* ---------------- UTILS ---------------- */
+
 const safe = (v: any) => (isNaN(v) || v === undefined ? 0 : v);
 
-// 🔥 FORMAT ₹
 const format = (v: number) =>
   `₹ ${Math.round(v || 0).toLocaleString("en-IN")}`;
+
+/* ---------------- COMPONENT ---------------- */
 
 export default function CalculatorRenderer({ config }: any) {
   const storageKey = `calc-${config.title}`;
@@ -56,7 +83,6 @@ export default function CalculatorRenderer({ config }: any) {
   const [values, setValues] = useState(initialState);
   const [showTable, setShowTable] = useState(false);
 
-  // 🔥 LOAD SAVED
   useEffect(() => {
     try {
       const saved = localStorage.getItem(storageKey);
@@ -64,23 +90,23 @@ export default function CalculatorRenderer({ config }: any) {
     } catch {}
   }, []);
 
-  // 🔥 SAVE
   useEffect(() => {
     try {
       localStorage.setItem(storageKey, JSON.stringify(values));
     } catch {}
   }, [values]);
 
-  // 🔥 COMPUTE RESULT (MEMO)
   const result = useMemo(() => runEngine(config.engine, values), [values]);
 
-  // 🔥 PIE DATA SAFE
+  const loan = isLoanResult(result) ? result : null;
+
+  /* ---------------- PIE ---------------- */
+
   const pieData = [
     { name: "Principal", value: safe(values.amount) },
-    { name: "Interest", value: safe((result as any)?.totalInterest ?? 0) },
+    { name: "Interest", value: safe(loan?.totalInterest ?? 0) },
   ];
 
-  // 🔥 HANDLE CHANGE WITH VALIDATION
   function handleChange(key: string, value: number, min?: number, max?: number) {
     if (isNaN(value)) return;
 
@@ -92,7 +118,6 @@ export default function CalculatorRenderer({ config }: any) {
     setValues((prev: any) => ({ ...prev, [key]: v }));
   }
 
-  // 🔥 SHARE
   function handleShare() {
     try {
       const params = new URLSearchParams(values).toString();
@@ -105,11 +130,10 @@ export default function CalculatorRenderer({ config }: any) {
   return (
     <div className="space-y-8">
 
-      {/* 🔥 MAIN GRID */}
       <div className="grid lg:grid-cols-[1.2fr_1fr] gap-6">
 
-        {/* LEFT INPUT */}
-        <div className="bg-white dark:bg-gray-900 border rounded-2xl p-6 space-y-6">
+        {/* LEFT */}
+        <div className="bg-white border rounded-2xl p-6 space-y-6">
 
           <h2 className="text-xl font-semibold">{config.title}</h2>
 
@@ -149,7 +173,7 @@ export default function CalculatorRenderer({ config }: any) {
           {/* ACTIONS */}
           <div className="flex flex-wrap gap-3 pt-4">
 
-            {result?.schedule && (
+            {loan?.schedule && (
               <button
                 onClick={() => setShowTable(!showTable)}
                 className="px-4 py-2 border rounded-lg"
@@ -158,18 +182,18 @@ export default function CalculatorRenderer({ config }: any) {
               </button>
             )}
 
-            {result?.schedule && (
+            {loan?.schedule && (
               <button
-                onClick={() => exportToCSV(result.schedule)}
+                onClick={() => exportToCSV(loan.schedule)}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg"
               >
                 CSV
               </button>
             )}
 
-            {result?.schedule && (
+            {loan?.schedule && (
               <button
-                onClick={() => exportToPDF(result.schedule)}
+                onClick={() => exportToPDF(loan.schedule)}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg"
               >
                 PDF
@@ -185,31 +209,32 @@ export default function CalculatorRenderer({ config }: any) {
           </div>
         </div>
 
-        {/* RIGHT RESULTS */}
-        <div className="bg-white dark:bg-gray-900 border rounded-2xl p-6 flex flex-col justify-between">
+        {/* RIGHT */}
+        <div className="bg-white border rounded-2xl p-6">
 
-          <div>
-            <p className="text-sm text-gray-500">Total Payment</p>
-            <p className="text-2xl font-bold text-green-600">
-              {format(result.totalPayment)}
-            </p>
+          <p className="text-sm text-gray-500">Total Payment</p>
+          <p className="text-2xl font-bold text-green-600">
+            {format(loan?.totalPayment ?? 0)}
+          </p>
 
-            <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
-              <div>
-                <p className="text-gray-500">Monthly EMI</p>
-                <p className="font-semibold">{format(result.emi)}</p>
-              </div>
+          <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
 
-              <div>
-                <p className="text-gray-500">Interest</p>
-                <p className="font-semibold">
-                  {format(result.totalInterest)}
-                </p>
-              </div>
+            <div>
+              <p className="text-gray-500">Monthly EMI</p>
+              <p className="font-semibold">
+                {format(loan?.emi ?? 0)}
+              </p>
             </div>
+
+            <div>
+              <p className="text-gray-500">Interest</p>
+              <p className="font-semibold">
+                {format(loan?.totalInterest ?? 0)}
+              </p>
+            </div>
+
           </div>
 
-          {/* DONUT */}
           <div className="h-56 mt-6">
             <ResponsiveContainer>
               <PieChart>
@@ -224,11 +249,11 @@ export default function CalculatorRenderer({ config }: any) {
         </div>
       </div>
 
-      {/* 🔥 FULL WIDTH CHART */}
-      {result?.schedule && (
+      {/* CHART */}
+      {loan?.schedule && (
         <div className="h-72 bg-white border rounded-2xl p-4">
           <ResponsiveContainer>
-            <LineChart data={result.schedule}>
+            <LineChart data={loan.schedule}>
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
@@ -238,25 +263,17 @@ export default function CalculatorRenderer({ config }: any) {
         </div>
       )}
 
-      {/* 🔥 TABLE */}
-      {showTable && result?.schedule && (
+      {/* TABLE */}
+      {showTable && loan?.schedule && (
         <div className="overflow-auto max-h-96 bg-white border rounded-xl">
           <table className="w-full text-sm">
-            <thead className="bg-gray-100 sticky top-0">
-              <tr>
-                <th className="p-2">Month</th>
-                <th className="p-2">Principal</th>
-                <th className="p-2">Interest</th>
-                <th className="p-2">Balance</th>
-              </tr>
-            </thead>
             <tbody>
-              {result.schedule.map((row: any, i: number) => (
-                <tr key={i} className="border-t hover:bg-gray-50">
-                  <td className="p-2">{row.month}</td>
-                  <td className="p-2">{row.principal}</td>
-                  <td className="p-2">{row.interest}</td>
-                  <td className="p-2">{row.balance}</td>
+              {loan.schedule.map((row: any, i: number) => (
+                <tr key={i}>
+                  <td>{row.month}</td>
+                  <td>{row.principal}</td>
+                  <td>{row.interest}</td>
+                  <td>{row.balance}</td>
                 </tr>
               ))}
             </tbody>
