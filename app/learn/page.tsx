@@ -103,7 +103,7 @@ export default function Learn() {
         {categories.map((cat) => (
           <button
             key={cat}
-            onClick={() => setActiveCategory(cat)}
+            onClick={() => setActiveCategory(cat || "")}
             className={`px-4 py-1.5 rounded-full text-sm border transition ${
               activeCategory === cat
                 ? "bg-blue-600 text-white border-blue-600"
