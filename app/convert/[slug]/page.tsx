@@ -2,7 +2,35 @@ import Link from "next/link"
 import { units } from "@/data/units"
 import { convertUnit } from "@/lib/converterEngine"
 
-// ✅ derive type from units (NO external file needed)
+// ✅ REQUIRED FOR STATIC EXPORT
+export const dynamic = "force-static"
+
+// ✅ GENERATE ALL STATIC ROUTES
+export async function generateStaticParams() {
+  const paths: { slug: string }[] = []
+
+  for (const category in units) {
+    const group = units[category as keyof typeof units]
+
+    if (!group || typeof group !== "object") continue
+
+    const unitList = Object.keys(group)
+
+    for (const from of unitList) {
+      for (const to of unitList) {
+        if (from === to) continue
+
+        paths.push({
+          slug: `${from}-to-${to}`,
+        })
+      }
+    }
+  }
+
+  return paths
+}
+
+// ✅ derive type from units
 type UnitCategory = keyof typeof units
 
 type PageProps = {
@@ -28,10 +56,7 @@ function parseSlug(slug: string): { from: string; to: string } | null {
 }
 
 // ✅ Detect category safely
-function getCategory(
-  from: string,
-  to: string
-): UnitCategory | null {
+function getCategory(from: string, to: string): UnitCategory | null {
   for (const key in units) {
     const typedKey = key as UnitCategory
     const group = units[typedKey]
@@ -45,7 +70,7 @@ function getCategory(
   return null
 }
 
-// 🔥 SEO Metadata
+// 🔥 SEO Metadata (safe)
 export function generateMetadata({ params }: PageProps) {
   const parsed = parseSlug(params.slug)
 
@@ -64,6 +89,7 @@ export function generateMetadata({ params }: PageProps) {
   }
 }
 
+// ✅ PAGE
 export default function ConvertPage({
   params,
   searchParams,
@@ -82,7 +108,7 @@ export default function ConvertPage({
 
   const { from: fromUnit, to: toUnit } = parsed
 
-  // ✅ Safe number parsing
+  // ✅ Safe number parsing (fail-safe)
   const inputValue = Number(searchParams?.value ?? 1)
   const safeValue = isNaN(inputValue) ? 1 : inputValue
 
@@ -98,13 +124,18 @@ export default function ConvertPage({
     )
   }
 
-  // ✅ SAFE conversion (no type error now)
-  const result = convertUnit({
-    category,
-    value: safeValue,
-    from: fromUnit,
-    to: toUnit,
-  })
+  // ✅ Safe conversion (fully type-safe)
+  let result = 0
+  try {
+    result = convertUnit({
+      category,
+      value: safeValue,
+      from: fromUnit,
+      to: toUnit,
+    })
+  } catch {
+    result = 0
+  }
 
   const formattedResult = Number(result.toFixed(6))
 
