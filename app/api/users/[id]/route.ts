@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server"
 
+// ✅ REQUIRED for static export (prevents build crash)
+export const dynamic = "force-static"
+
 type Context = {
-  params: Promise<{ id: string }>
+  params: { id: string }
 }
 
 type User = {
@@ -16,41 +19,36 @@ const users: User[] = [
   { id: 2, name: "Jane Smith", email: "jane@example.com" }
 ]
 
-/*
-Delay helper
-Supports:
- /api/users/1?delay=3
-*/
+// ⏱ Delay helper
 async function handleDelay(req: Request) {
-
   const { searchParams } = new URL(req.url)
 
   let delay = Number(searchParams.get("delay"))
-
   if (isNaN(delay)) delay = 0
-
-  if (delay > 60) delay = 60
+  if (delay > 5) delay = 5 // 🔥 reduced for production safety
 
   if (delay > 0) {
-    await new Promise(resolve =>
+    await new Promise((resolve) =>
       setTimeout(resolve, delay * 1000)
     )
   }
-
 }
 
-/*
-GET USER
-/api/users/1
-*/
-export async function GET(req: Request, context: Context) {
+/* ---------------- GET ---------------- */
 
+export async function GET(req: Request, { params }: Context) {
   await handleDelay(req)
 
-  const { id } = await context.params
-  const userId = Number(id)
+  const userId = Number(params.id)
 
-  const user = users.find(u => u.id === userId)
+  if (isNaN(userId)) {
+    return NextResponse.json(
+      { error: "Invalid user ID" },
+      { status: 400 }
+    )
+  }
+
+  const user = users.find((u) => u.id === userId)
 
   if (!user) {
     return NextResponse.json(
@@ -59,71 +57,62 @@ export async function GET(req: Request, context: Context) {
     )
   }
 
-  return NextResponse.json({
-    data: user
-  })
+  return NextResponse.json({ data: user })
 }
 
-/*
-PUT USER (full update)
-*/
-export async function PUT(req: Request, context: Context) {
+/* ---------------- PUT ---------------- */
 
+export async function PUT(req: Request, { params }: Context) {
   await handleDelay(req)
-
-  const { id } = await context.params
 
   let body: Partial<User> = {}
 
   try {
     body = await req.json()
-  } catch {
-    body = {}
-  }
+  } catch {}
 
   return NextResponse.json({
-    id: Number(id),
+    id: Number(params.id),
     name: body.name ?? "Updated User",
     email: body.email ?? "updated@example.com",
     updatedAt: new Date().toISOString()
   })
 }
 
-/*
-PATCH USER (partial update)
-*/
-export async function PATCH(req: Request, context: Context) {
+/* ---------------- PATCH ---------------- */
 
+export async function PATCH(req: Request, { params }: Context) {
   await handleDelay(req)
-
-  const { id } = await context.params
 
   let body: Partial<User> = {}
 
   try {
     body = await req.json()
-  } catch {
-    body = {}
-  }
+  } catch {}
 
   return NextResponse.json({
-    id: Number(id),
+    id: Number(params.id),
     ...body,
     patchedAt: new Date().toISOString()
   })
 }
 
-/*
-DELETE USER
-*/
-export async function DELETE(req: Request, context: Context) {
+/* ---------------- DELETE ---------------- */
 
+export async function DELETE(req: Request, { params }: Context) {
   await handleDelay(req)
 
-  const { id } = await context.params
-
   return NextResponse.json({
-    message: `User ${id} deleted`,
+    message: `User ${params.id} deleted`,
     deletedAt: new Date().toISOString()
   })
+}
+
+/* ---------------- BLOCK OTHER METHODS ---------------- */
+
+export function POST() {
+  return NextResponse.json(
+    { error: "Method not allowed" },
+    { status: 405 }
+  )
 }
