@@ -44,9 +44,13 @@ type PageProps = {
 
 // ✅ Safe slug parsing
 function parseSlug(slug: string): { from: string; to: string } | null {
-  if (!slug.includes("-to-")) return null
+  if (!slug || !slug.includes("-to-")) return null
 
-  const [from, to] = slug.split("-to-")
+  const parts = slug.split("-to-")
+  if (parts.length !== 2) return null
+
+  const [from, to] = parts
+
   if (!from || !to) return null
 
   return {
@@ -55,22 +59,25 @@ function parseSlug(slug: string): { from: string; to: string } | null {
   }
 }
 
-// ✅ Detect category safely
+// ✅ Detect category safely (STRICT)
 function getCategory(from: string, to: string): UnitCategory | null {
   for (const key in units) {
     const typedKey = key as UnitCategory
     const group = units[typedKey]
 
-    if (group && typeof group === "object") {
-      if (from in group && to in group) {
-        return typedKey
-      }
+    if (!group || typeof group !== "object") continue
+
+    const hasFrom = Object.prototype.hasOwnProperty.call(group, from)
+    const hasTo = Object.prototype.hasOwnProperty.call(group, to)
+
+    if (hasFrom && hasTo) {
+      return typedKey
     }
   }
   return null
 }
 
-// 🔥 SEO Metadata (safe)
+// 🔥 SEO Metadata
 export function generateMetadata({ params }: PageProps) {
   const parsed = parseSlug(params.slug)
 
@@ -90,10 +97,7 @@ export function generateMetadata({ params }: PageProps) {
 }
 
 // ✅ PAGE
-export default function ConvertPage({
-  params,
-  searchParams,
-}: PageProps) {
+export default function ConvertPage({ params, searchParams }: PageProps) {
   const parsed = parseSlug(params.slug)
 
   if (!parsed) {
@@ -108,7 +112,7 @@ export default function ConvertPage({
 
   const { from: fromUnit, to: toUnit } = parsed
 
-  // ✅ Safe number parsing (fail-safe)
+  // ✅ Safe number parsing
   const inputValue = Number(searchParams?.value ?? 1)
   const safeValue = isNaN(inputValue) ? 1 : inputValue
 
@@ -124,8 +128,9 @@ export default function ConvertPage({
     )
   }
 
-  // ✅ Safe conversion (fully type-safe)
-  let result = 0
+  // 🔥 FULLY SAFE CONVERSION
+  let result: number
+
   try {
     result = convertUnit({
       category,
@@ -133,8 +138,27 @@ export default function ConvertPage({
       from: fromUnit,
       to: toUnit,
     })
-  } catch {
-    result = 0
+
+    // extra validation
+    if (typeof result !== "number" || isNaN(result)) {
+      throw new Error("Invalid result")
+    }
+
+  } catch (error) {
+    console.error("Conversion error:", {
+      category,
+      fromUnit,
+      toUnit,
+      error,
+    })
+
+    return (
+      <div className="py-20 text-center">
+        <h1 className="text-2xl font-semibold">
+          Conversion failed
+        </h1>
+      </div>
+    )
   }
 
   const formattedResult = Number(result.toFixed(6))
