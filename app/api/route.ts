@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server"
 
-export async function GET() {
+// ✅ REQUIRED for static export (CRITICAL FIX)
+export const dynamic = "force-static"
 
+export async function GET() {
   return NextResponse.json({
     name: "MockAPIs Demo API",
     description: "Free mock APIs for testing and learning API development.",
@@ -27,4 +29,33 @@ export async function GET() {
       }
     }
   })
+}
+
+// ❌ Block all other methods (good practice)
+export function POST() {
+  return NextResponse.json(
+    { error: "Method not allowed" },
+    { status: 405 }
+  )
+}
+
+export function PUT() {
+  return NextResponse.json(
+    { error: "Method not allowed" },
+    { status: 405 }
+  )
+}
+
+export function DELETE() {
+  return NextResponse.json(
+    { error: "Method not allowed" },
+    { status: 405 }
+  )
+}
+
+export function PATCH() {
+  return NextResponse.json(
+    { error: "Method not allowed" },
+    { status: 405 }
+  )
 }
