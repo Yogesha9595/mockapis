@@ -2,8 +2,8 @@ import { Suspense } from "react"
 import ClientTool from "./ClientTool"
 import type { Metadata } from "next"
 
-/* 🔥 CRITICAL FIX (prevents prerender crash) */
-export const dynamic = "force-dynamic"
+/* ✅ STATIC EXPORT SAFE */
+export const dynamic = "force-static"
 
 /* ✅ NEXT-LEVEL SEO METADATA */
 export const metadata: Metadata = {
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   },
 }
 
-/* ✅ Wrapper (avoids direct hook conflict) */
+/* ✅ Wrapper (safe for client hooks) */
 function ToolWrapper() {
   return <ClientTool />
 }
@@ -69,12 +69,11 @@ function ToolWrapper() {
 export default function Page() {
   return (
     <>
-      {/* ✅ FIX: Suspense + Wrapper */}
       <Suspense fallback={<div className="p-6 text-center">Loading tool...</div>}>
         <ToolWrapper />
       </Suspense>
 
-      {/* 🔥 ALL SCHEMAS */}
+      {/* ✅ Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
