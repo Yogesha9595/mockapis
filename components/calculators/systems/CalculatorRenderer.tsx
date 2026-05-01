@@ -77,7 +77,7 @@ export default function CalculatorRenderer({ config }: any) {
   // 🔥 PIE DATA SAFE
   const pieData = [
     { name: "Principal", value: safe(values.amount) },
-    { name: "Interest", value: safe(result.totalInterest) },
+    { name: "Interest", value: safe((result as any)?.totalInterest ?? 0) },
   ];
 
   // 🔥 HANDLE CHANGE WITH VALIDATION
