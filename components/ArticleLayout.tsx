@@ -21,7 +21,7 @@ export default function ArticleLayout({
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
 
       {/* Breadcrumb */}
-      <Breadcrumb title={title} />
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Learn", href: "/learn" }, { label: title }]} />
 
       {/* Title */}
       <h1 className="text-4xl font-bold leading-tight text-gray-900 mb-4">

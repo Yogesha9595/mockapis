@@ -1,12 +1,15 @@
 import type { Metadata } from "next"
 import ToolClient from "./ToolClient"
 import SeoContent from "./SeoContent"
+import { absoluteUrl, pageMetadata } from "@/lib/site"
 
-export const metadata: Metadata = {
-  title: "Schema Markup Validator Tool (JSON-LD + URL Checker)",
+const PATH = "/tools/schema-validator"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Schema Markup Validator – JSON-LD Structured Data Checker",
   description:
-    "Validate schema markup instantly. Check JSON-LD and structured data from any URL. Free SEO schema validator with scoring and insights.",
-
+    "Check Schema.org JSON-LD structured data for syntax errors and missing required properties. Paste JSON-LD or page HTML; runs in your browser.",
+  path: PATH,
   keywords: [
     "schema validator",
     "json ld validator",
@@ -14,27 +17,7 @@ export const metadata: Metadata = {
     "schema markup checker",
     "rich results test alternative",
   ],
-
-  openGraph: {
-    title: "Schema Markup Validator Tool",
-    description:
-      "Validate JSON-LD and structured data instantly with SEO scoring.",
-    url: "https://mockapis.in/tools/schema-validator",
-    siteName: "MockAPIs",
-    type: "website",
-  },
-
-  twitter: {
-    card: "summary_large_image",
-    title: "Schema Markup Validator Tool",
-    description:
-      "Validate JSON-LD and structured data instantly with SEO scoring.",
-  },
-
-  alternates: {
-    canonical: "https://mockapis.in/tools/schema-validator",
-  },
-}
+})
 
 export default function Page() {
   return (
@@ -64,7 +47,7 @@ export default function Page() {
               operatingSystem: "All",
               description:
                 "Validate JSON-LD and structured data instantly with this free schema validator tool.",
-              url: "https://mockapis.in/tools/schema-validator",
+              url: absoluteUrl(PATH),
             },
             {
               "@context": "https://schema.org",

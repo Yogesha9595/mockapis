@@ -1,177 +1,275 @@
-"use client"
-
+import type { Metadata } from "next"
 import Link from "next/link"
-import { motion } from "framer-motion"
-import ApiWidget from "@/components/ApiWidget"
-import ApiCodeTerminal from "@/components/ApiCodeTerminal"
+import { ArrowRight, Braces, Binary, Wrench, Type, Code2, ShieldCheck, Zap, BadgeCheck } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+
+import ToolSearch from "@/components/home/ToolSearch"
+import { buttonVariants } from "@/components/ui/Button"
+import { Card } from "@/components/ui/Card"
+import Badge from "@/components/ui/Badge"
+import { liveToolLinks, toolCategories, categoryHref, type ToolLink } from "@/data/tools"
+import { getAllArticles } from "@/lib/blog/getAllArticles"
+import { SITE_NAME, absoluteUrl, pageMetadata } from "@/lib/site"
+
+/* ---------------- METADATA (same title/description as before, plus canonical) ---------------- */
+
+const TITLE = `${SITE_NAME} – Free Developer Tools & Utilities`
+const DESCRIPTION =
+  "Free developer tools including mock APIs, JSON formatter, converters, compilers, and API playground to build faster."
+
+export const metadata: Metadata = {
+  ...pageMetadata({ title: TITLE, description: DESCRIPTION, path: "/" }),
+  title: { absolute: TITLE }, // don't append the "| DevUtilities Lab" template to the homepage
+}
+
+/* ---------------- CONTENT CHOICES ---------------- */
+
+/** Hand-picked everyday tools. Any that stop working simply drop out (filtered by liveToolLinks). */
+const FEATURED = [
+  "json-formatter",
+  "json-validator",
+  "base64-encoder",
+  "url-encoder",
+  "jwt-decoder",
+  "uuid-generator",
+  "timestamp-converter",
+  "view-source",
+]
+
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  json: Braces,
+  encoding: Binary,
+  developer: Wrench,
+  text: Type,
+  formatter: Code2,
+}
+
+const sectionTitle = "text-xl font-semibold tracking-tight text-foreground sm:text-2xl"
+const sectionLead = "mt-1 text-sm text-muted sm:text-base"
+const inlineLink = "font-medium text-primary underline-offset-2 hover:underline"
+
+function ToolCard({ tool }: { tool: ToolLink }) {
+  return (
+    <Link href={tool.href} className="group block h-full rounded-container">
+      <Card interactive className="flex h-full flex-col">
+        <h3 className="font-semibold text-foreground group-hover:text-primary">{tool.name}</h3>
+        <p className="mt-1 flex-1 text-sm leading-relaxed text-muted">{tool.description}</p>
+        <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+          Open tool <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </span>
+      </Card>
+    </Link>
+  )
+}
 
 export default function Home() {
+  const live = liveToolLinks()
+  const featured = FEATURED.map((slug) => live.find((t) => t.slug === slug)).filter((t) => t !== undefined)
+  const categories = toolCategories
+    .map((c) => ({ ...c, tools: live.filter((t) => t.category === c.id), href: categoryHref(c.id) }))
+    .filter((c) => c.tools.length > 0)
+  const guides = [...getAllArticles()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4)
 
-  const fadeUp = {
-    hidden: { opacity: 0, y: 30 },
-    show: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { delay: i * 0.1, duration: 0.5 }
-    })
-  }
+  const jsonLd = [
+    { "@context": "https://schema.org", "@type": "WebSite", name: SITE_NAME, url: absoluteUrl("/") },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: absoluteUrl("/"),
+      logo: absoluteUrl("/icon-512.png"),
+      sameAs: ["https://github.com/devutilitieslab", "https://t.me/devutilities_lab"],
+    },
+  ]
 
   return (
-    <main>
+    <div className="space-y-16 sm:space-y-20">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      {/* 🔥 HERO */}
-      <section className="relative w-full py-28 overflow-hidden bg-white dark:bg-[#020617]">
-
-        {/* GRID BG */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] opacity-30" />
-
-          {/* glow */}
-          <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[900px] h-[900px] bg-green-500/20 blur-[160px] rounded-full" />
+      {/* ---------------- HERO + SEARCH ---------------- */}
+      <section aria-labelledby="hero-title" className="pt-6 sm:pt-12">
+        <div className="max-w-3xl">
+          <Badge variant="success">{live.length} free tools · runs in your browser</Badge>
+          <h1 id="hero-title" className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+            Online tools for everyday developer tasks
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
+            Format and validate JSON, encode and decode Base64 or URLs, inspect JWTs, generate UUIDs and convert
+            timestamps. Fast, free and private: your data stays on your device.
+          </p>
         </div>
 
-        <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 grid md:grid-cols-2 gap-16 items-center">
-
-          {/* LEFT */}
-          <motion.div initial="hidden" animate="show">
-
-            {/* BADGE */}
-            <motion.div custom={0} variants={fadeUp}
-              className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border border-gray-300 dark:border-gray-700 bg-white/60 dark:bg-white/5 backdrop-blur text-sm font-medium">
-              🚀 Free Developer Tools Platform
-            </motion.div>
-
-            {/* HEADING */}
-            <motion.h1 custom={1} variants={fadeUp}
-              className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight tracking-tight">
-              Build Faster with
-              <span className="block bg-gradient-to-r from-green-500 to-emerald-400 bg-clip-text text-transparent">
-                DevUtilities Lab
-              </span>
-            </motion.h1>
-
-            {/* DESCRIPTION */}
-            <motion.p custom={2} variants={fadeUp}
-              className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-xl">
-              Powerful mock APIs, JSON tools, compilers, converters, and developer utilities to help you build, test, and ship faster.
-            </motion.p>
-
-            {/* CTA */}
-            <motion.div custom={3} variants={fadeUp}
-              className="flex flex-wrap gap-4">
-              <Link
-                href="/playground"
-                className="bg-green-600 hover:bg-green-700 transition text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.03]"
-              >
-                🚀 Start Testing APIs
-              </Link>
-
-              <Link
-                href="/tools"
-                className="border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition px-6 py-3 rounded-lg font-medium"
-              >
-                Explore Tools
-              </Link>
-            </motion.div>
-
-            {/* TRUST */}
-            <motion.div custom={4} variants={fadeUp}
-              className="flex gap-10 mt-12 text-sm text-gray-500">
-              {[
-                { value: "10k+", label: "Developers" },
-                { value: "100+", label: "Tools" },
-                { value: "99.9%", label: "Uptime" }
-              ].map((item, i) => (
-                <div key={i}>
-                  <p className="text-xl font-semibold text-black dark:text-white">
-                    {item.value}
-                  </p>
-                  {item.label}
-                </div>
-              ))}
-            </motion.div>
-
-          </motion.div>
-
-          {/* RIGHT */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative"
-          >
-            <div className="rounded-2xl border border-white/20 bg-white/10 dark:bg-white/5 backdrop-blur-xl shadow-2xl p-4 hover:shadow-green-500/10 transition">
-              <ApiCodeTerminal />
-            </div>
-          </motion.div>
-
+        <div className="mt-8">
+          <ToolSearch tools={live} />
         </div>
 
-        {/* divider */}
-        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-700 to-transparent" />
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/tools" className={buttonVariants({ size: "lg" })}>
+            Browse all tools
+          </Link>
+          <Link href="/learn" className={buttonVariants({ variant: "secondary", size: "lg" })}>
+            Read developer guides
+          </Link>
+        </div>
       </section>
 
-      {/* CONTENT */}
-      <div className="max-w-7xl mx-auto px-6">
-
-        {/* API TESTER */}
-        <section className="py-24">
-          <ApiWidget />
-        </section>
-
-        {/* FEATURES */}
-        <section className="py-24">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 tracking-tight">
-            Built for Developers
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-10">
-
-            {[
-              {
-                title: "Mock REST APIs",
-                desc: "Instantly test CRUD operations with realistic API responses."
-              },
-              {
-                title: "API Playground",
-                desc: "Send API requests directly in your browser."
-              },
-              {
-                title: "Developer Learning",
-                desc: "Learn APIs, HTTP codes, and backend fundamentals."
-              }
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ y: -6 }}
-                transition={{ duration: 0.2 }}
-                className="p-8 border border-gray-200 dark:border-gray-800 rounded-xl bg-white dark:bg-[#020617] hover:shadow-2xl"
-              >
-                <h3 className="font-semibold text-lg mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  {item.desc}
-                </p>
-              </motion.div>
-            ))}
-
+      {/* ---------------- FEATURED TOOLS ---------------- */}
+      <section aria-labelledby="featured-title">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 id="featured-title" className={sectionTitle}>Featured tools</h2>
+            <p className={sectionLead}>The utilities developers reach for every day.</p>
           </div>
-        </section>
+          <Link href="/tools" className={`${inlineLink} text-sm`}>All tools →</Link>
+        </div>
+        <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {featured.map((tool) => (
+            <li key={tool.slug}>
+              <ToolCard tool={tool} />
+            </li>
+          ))}
+        </ul>
+      </section>
 
-        {/* SEO SECTION */}
-        <section className="py-20 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            Free Developer Tools for Faster Workflow
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            DevUtilities Lab provides mock APIs, JSON tools, compilers,
-            converters, and utilities to speed up development.
+      {/* ---------------- CATEGORIES ---------------- */}
+      <section aria-labelledby="categories-title">
+        <h2 id="categories-title" className={sectionTitle}>Browse by category</h2>
+        <p className={sectionLead}>Every tool listed here works today.</p>
+        <ul className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {categories.map((category) => {
+            const Icon = CATEGORY_ICONS[category.id] ?? Wrench
+            return (
+              <li key={category.id}>
+                <Card className="h-full">
+                  <div className="flex items-start gap-3">
+                    <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-surface text-primary">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-foreground">
+                        {category.href ? (
+                          <Link href={category.href} className="hover:text-primary">{category.name}</Link>
+                        ) : (
+                          category.name
+                        )}
+                      </h3>
+                      <p className="text-sm text-muted">{category.description}</p>
+                    </div>
+                  </div>
+                  <ul className="mt-4 space-y-1.5">
+                    {category.tools.map((tool) => (
+                      <li key={tool.slug}>
+                        <Link href={tool.href} className="text-sm text-foreground hover:text-primary hover:underline">
+                          {tool.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              </li>
+            )
+          })}
+        </ul>
+      </section>
+
+      {/* ---------------- ABOUT ---------------- */}
+      <section aria-labelledby="about-title" className="rounded-container border border-border bg-card p-6 shadow-card sm:p-8">
+        <h2 id="about-title" className={sectionTitle}>About {SITE_NAME}</h2>
+        <p className="mt-2 max-w-3xl leading-relaxed text-muted">
+          {SITE_NAME} is a collection of focused utilities for developers, testers and anyone who works with
+          structured data. Each tool does one job and explains its errors clearly.
+        </p>
+        <ul className="mt-6 grid gap-6 sm:grid-cols-3">
+          <li className="flex gap-3">
+            <ShieldCheck className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+            <div>
+              <h3 className="font-semibold text-foreground">Private by design</h3>
+              <p className="mt-1 text-sm text-muted">The tools run in your browser. What you paste is not uploaded to a server.</p>
+            </div>
+          </li>
+          <li className="flex gap-3">
+            <Zap className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+            <div>
+              <h3 className="font-semibold text-foreground">Free, no sign-up</h3>
+              <p className="mt-1 text-sm text-muted">Open a tool and use it. There are no accounts or usage quotas.</p>
+            </div>
+          </li>
+          <li className="flex gap-3">
+            <BadgeCheck className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+            <div>
+              <h3 className="font-semibold text-foreground">Tested before listed</h3>
+              <p className="mt-1 text-sm text-muted">Tools that are still in development are clearly marked “coming soon” instead of shipping half-finished.</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      {/* ---------------- GUIDES ---------------- */}
+      {guides.length > 0 && (
+        <section aria-labelledby="guides-title">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2 id="guides-title" className={sectionTitle}>Guides &amp; learning resources</h2>
+              <p className={sectionLead}>Practical articles on APIs and backend development.</p>
+            </div>
+            <Link href="/learn" className={`${inlineLink} text-sm`}>All guides →</Link>
+          </div>
+          <ul className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+            {guides.map((article) => (
+              <li key={article.slug}>
+                <Link href={`/learn/${article.slug}`} className="group block h-full rounded-container">
+                  <Card interactive className="h-full">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted">
+                      {article.category} · {article.readingTime}
+                    </p>
+                    <h3 className="mt-1 font-semibold text-foreground group-hover:text-primary">{article.title}</h3>
+                    {article.description && <p className="mt-1 text-sm leading-relaxed text-muted">{article.description}</p>}
+                  </Card>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-sm text-muted">
+            Also see the <Link href="/http-status-codes" className={inlineLink}>HTTP status codes reference</Link>.
           </p>
         </section>
+      )}
 
-      </div>
-
-    </main>
+      {/* ---------------- SEO CONTENT ---------------- */}
+      <section aria-labelledby="seo-title" className="max-w-3xl">
+        <h2 id="seo-title" className={sectionTitle}>Developer utilities that respect your data</h2>
+        <div className="mt-4 space-y-6 leading-relaxed text-muted">
+          <div>
+            <h3 className="font-semibold text-foreground">Format and validate JSON</h3>
+            <p className="mt-1">
+              API responses are often minified onto a single line. The{" "}
+              <Link href="/tools/json-formatter" className={inlineLink}>JSON formatter</Link> indents them for
+              reading, and the <Link href="/tools/json-validator" className={inlineLink}>JSON validator</Link> points
+              to the exact line and column of a syntax error, such as a trailing comma or an unquoted key.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground">Base64 versus URL encoding</h3>
+            <p className="mt-1">
+              They solve different problems. <Link href="/tools/base64-encoder" className={inlineLink}>Base64</Link>{" "}
+              turns any text into a safe set of 64 characters for embedding in JSON, headers or data URLs.{" "}
+              <Link href="/tools/url-encoder" className={inlineLink}>URL encoding</Link> escapes only the characters
+              that have a special meaning in a URL, such as spaces, &amp; and =. Both tools handle Unicode and emoji as
+              UTF-8.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground">Inspect tokens and timestamps</h3>
+            <p className="mt-1">
+              The <Link href="/tools/jwt-decoder" className={inlineLink}>JWT decoder</Link> shows a token&apos;s header,
+              claims and expiry in readable form. Decoding does not verify the signature, so never trust a token based
+              on its contents alone. The{" "}
+              <Link href="/tools/timestamp-converter" className={inlineLink}>Unix timestamp converter</Link> detects
+              seconds or milliseconds automatically and shows UTC and your local time.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
   )
 }

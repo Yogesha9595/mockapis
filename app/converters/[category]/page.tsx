@@ -1,8 +1,13 @@
+import type { Metadata } from "next"
 import { units } from "@/data/units"
 import Link from "next/link"
+import { pageMetadata } from "@/lib/site"
 
 // ✅ REQUIRED FOR STATIC EXPORT
 export const dynamic = "force-static"
+
+// Only categories in data/units.ts exist; anything else is a real 404
+export const dynamicParams = false
 
 // ✅ GENERATE STATIC PARAMS
 export async function generateStaticParams() {
@@ -11,24 +16,26 @@ export async function generateStaticParams() {
   }))
 }
 
+// ✅ Next.js 16: params is a Promise
 type PageProps = {
-  params: {
+  params: Promise<{
     category: string
-  }
+  }>
 }
 
 // 🔥 SEO metadata (safe)
-export function generateMetadata({ params }: PageProps) {
-  const category = params.category || "converter"
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { category } = await params
 
-  return {
+  return pageMetadata({
     title: `${category} Converter – Free Online Tool`,
     description: `Convert ${category} units instantly using our free online converter.`,
-  }
+    path: `/converters/${category}`,
+  })
 }
 
-export default function ConverterCategoryPage({ params }: PageProps) {
-  const category = params.category
+export default async function ConverterCategoryPage({ params }: PageProps) {
+  const { category } = await params
 
   const categoryUnits =
     category === "temperature"

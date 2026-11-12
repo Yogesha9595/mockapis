@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --import tsx --test \"tests/unit/**/*.test.ts\"",
+    "generate:ai": "tsx scripts/generateSections.ts"
   },
   "dependencies": {
     "@mdx-js/react": "^3.1.1",
@@ -15,6 +17,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "framer-motion": "^12.38.0",
     "fuse.js": "^7.1.0",
+    "gray-matter": "^4.0.3",
     "iconv-lite": "^0.7.2",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
@@ -36,9 +39,12 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "openai": "^6.35.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

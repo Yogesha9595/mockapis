@@ -57,7 +57,7 @@ export default function Layout({ code, children, onSelect }: Props) {
         </h1>
 
         <span className="text-xs text-zinc-500">
-          mockapis.in
+          devutilitieslab.com
         </span>
       </div>
 

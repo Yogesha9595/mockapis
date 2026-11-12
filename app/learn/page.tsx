@@ -1,213 +1,205 @@
-"use client"
-
+import ClientFilter from "@/components/blog/ClientFilter"
+import { getAllArticles } from "@/lib/blog/getAllArticles"
+import type { Metadata } from "next"
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
+import { absoluteUrl, pageMetadata } from "@/lib/site"
 
-type Article = {
-  slug: string
-  title: string
-  description: string
-  category?: string
-  readingTime?: string
-}
+export const dynamic = "force-static"
 
-export default function Learn() {
-  const [articles, setArticles] = useState<Article[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const [search, setSearch] = useState("")
-  const [activeCategory, setActiveCategory] = useState("all")
+/* ---------------- SEO METADATA ---------------- */
+// Root layout template appends " | DevUtilities Lab" to the title
+export const metadata: Metadata = pageMetadata({
+  title: "API Learning Hub",
+  description:
+    "Learn APIs, HTTP requests, backend concepts, and real-world development with in-depth guides and tutorials.",
+  path: "/learn",
+  keywords: [
+    "API tutorials",
+    "learn APIs",
+    "REST API guide",
+    "backend development",
+    "HTTP codes",
+    "developer learning",
+  ],
+})
 
-  // ✅ Fetch articles (production safe)
-  useEffect(() => {
-    let mounted = true
+/* ---------------- PAGE ---------------- */
+export default function LearnPage() {
+  const articles = getAllArticles()
 
-    const fetchArticles = async () => {
-      try {
-        const res = await fetch("/api/articles", {
-          cache: "no-store",
-        })
+  if (!articles || articles.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto py-20 text-center">
+        <h1 className="text-2xl font-semibold">No articles found</h1>
+      </div>
+    )
+  }
 
-        if (!res.ok) throw new Error("Failed to fetch")
+  /* ---------- CATEGORY ---------- */
+  const categories = Array.from(
+    new Set(articles.map((a) => a.category || "General"))
+  )
 
-        const data = await res.json()
+  /* ---------- RANKING SYSTEM ---------- */
+  const sortedArticles = [...articles]
+  const featured = sortedArticles[0]
+  const trending = sortedArticles.slice(1, 5)
 
-        if (mounted) setArticles(data)
-      } catch (err) {
-        console.error(err)
-        setError("Failed to load articles")
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
+  /* ---------- JSON-LD SEO ---------- */
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "API Learning Hub",
+    url: absoluteUrl("/learn"),
+    description:
+      "Learn APIs, backend concepts, and HTTP fundamentals step-by-step.",
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: articles.map((article, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: absoluteUrl(`/learn/${article.slug}`),
+        name: article.title,
+      })),
+    },
+  }
 
-    fetchArticles()
-
-    return () => {
-      mounted = false
-    }
-  }, [])
-
-  // ✅ Categories (memoized)
-  const categories = useMemo(() => {
-    return [
-      "all",
-      ...Array.from(
-        new Set(articles.map((a) => a.category).filter(Boolean))
-      ),
-    ]
-  }, [articles])
-
-  // ✅ Filter (optimized)
-  const filteredArticles = useMemo(() => {
-    return articles.filter((article) => {
-      const matchesSearch = article.title
-        .toLowerCase()
-        .includes(search.toLowerCase())
-
-      const matchesCategory =
-        activeCategory === "all" ||
-        article.category === activeCategory
-
-      return matchesSearch && matchesCategory
-    })
-  }, [articles, search, activeCategory])
+  /* ---------- BREADCRUMB SCHEMA ---------- */
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: absoluteUrl("/"),
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Learn",
+        item: absoluteUrl("/learn"),
+      },
+    ],
+  }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="max-w-7xl mx-auto px-4 py-10">
 
-      {/* 🔥 HEADER */}
-      <div className="mb-10">
-        <h1 className="text-4xl font-bold mb-3 tracking-tight">
+      {/* 🔥 SCHEMA */}
+      {[jsonLd, breadcrumbSchema].map((schema, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
+
+      {/* 🍞 BREADCRUMB UI */}
+      <nav className="text-sm mb-6 text-gray-500 dark:text-gray-400">
+        <Link href="/" className="hover:underline">Home</Link> /{" "}
+        <span className="text-gray-700 dark:text-gray-200">Learn</span>
+      </nav>
+
+      {/* 🧠 HEADER */}
+      <div className="mb-10 text-center">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
           API Learning Hub
         </h1>
-
-        <p className="text-gray-600 text-lg max-w-2xl">
-          Learn APIs, HTTP requests, backend concepts, and real-world development step-by-step.
+        <p className="text-gray-600 dark:text-gray-400 mt-2 max-w-xl mx-auto">
+          Learn APIs, backend concepts, and real-world development step-by-step.
         </p>
       </div>
 
-      {/* 🔍 SEARCH */}
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search articles..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
-        />
-      </div>
-
-      {/* 🧩 CATEGORY FILTER */}
-      <div className="flex flex-wrap gap-2 mb-10">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setActiveCategory(cat || "")}
-            className={`px-4 py-1.5 rounded-full text-sm border transition ${
-              activeCategory === cat
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-white text-gray-700 hover:bg-gray-100"
-            }`}
+      {/* ⭐ FEATURED */}
+      {featured && (
+        <div className="mb-12">
+          <Link
+            href={`/learn/${featured.slug}`}
+            className="block rounded-2xl p-6 md:p-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:opacity-95 transition"
           >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* ❌ ERROR */}
-      {error && (
-        <div className="mb-6 p-4 border border-red-200 bg-red-50 text-red-600 rounded-lg">
-          {error}
+            <p className="text-xs uppercase opacity-80 mb-2 tracking-wider">
+              Featured Article
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold mb-3">
+              {featured.title}
+            </h2>
+            <p className="opacity-90 max-w-2xl">
+              {featured.description}
+            </p>
+          </Link>
         </div>
       )}
 
-      {/* ⏳ LOADING */}
-      {loading ? (
-        <SkeletonGrid />
-      ) : (
-        <div className="grid md:grid-cols-2 gap-6">
+      {/* 📊 LAYOUT */}
+      <div className="grid lg:grid-cols-[1fr_300px] gap-10">
 
-          {filteredArticles.map((article, index) => (
-            <div key={article.slug} className="contents">
+        {/* 📚 MAIN */}
+        <div>
+          <ClientFilter articles={articles} categories={categories} />
+        </div>
 
-              <ArticleCard article={article} />
+        {/* 📌 SIDEBAR */}
+        <aside className="space-y-8 lg:sticky lg:top-20 h-fit">
 
-              {/* 💰 AD (clean placement) */}
-              {(index + 1) % 4 === 0 && <AdBlock key={`ad-${index}`} />}
+          {/* 🔥 TRENDING */}
+          <div className="p-5 border rounded-xl bg-white dark:bg-zinc-900 dark:border-zinc-800">
+            <h3 className="font-semibold mb-4 text-gray-900 dark:text-white">
+              🔥 Trending
+            </h3>
 
+            <div className="space-y-3">
+              {trending.map((article) => (
+                <Link
+                  key={article.slug}
+                  href={`/learn/${article.slug}`}
+                  className="block text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 transition"
+                >
+                  {article.title}
+                </Link>
+              ))}
             </div>
-          ))}
+          </div>
 
-        </div>
-      )}
+          {/* 🧩 CATEGORIES */}
+          <div className="p-5 border rounded-xl bg-white dark:bg-zinc-900 dark:border-zinc-800">
+            <h3 className="font-semibold mb-4 text-gray-900 dark:text-white">
+              Categories
+            </h3>
 
-      {/* EMPTY STATE */}
-      {!loading && filteredArticles.length === 0 && (
-        <div className="text-center mt-16 text-gray-500">
-          No articles found.
-        </div>
-      )}
-    </div>
-  )
-}
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <span
+                  key={cat}
+                  className="text-xs px-3 py-1 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300"
+                >
+                  {cat}
+                </span>
+              ))}
+            </div>
+          </div>
 
-/* ---------------- COMPONENTS ---------------- */
+          {/* 🚀 CTA */}
+          <div className="p-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-center">
+            <h3 className="font-semibold mb-2">
+              Build Faster with DevUtilities 🚀
+            </h3>
+            <p className="text-sm opacity-90 mb-4">
+              Explore powerful developer tools and APIs.
+            </p>
+            <Link
+              href="/tools"
+              className="inline-block px-4 py-2 bg-white text-black rounded-lg text-sm font-medium"
+            >
+              Explore Tools
+            </Link>
+          </div>
 
-function ArticleCard({ article }: { article: Article }) {
-  return (
-    <Link
-      href={`/learn/${article.slug}`}
-      className="group border rounded-xl p-5 bg-white hover:shadow-lg transition"
-    >
-      <h2 className="font-semibold text-lg mb-2 text-gray-900 group-hover:text-blue-600 transition">
-        {article.title}
-      </h2>
-
-      <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-        {article.description}
-      </p>
-
-      <div className="text-xs text-gray-400 flex items-center justify-between">
-        <span>{article.category}</span>
-        <span>{article.readingTime}</span>
-      </div>
-    </Link>
-  )
-}
-
-function SkeletonGrid() {
-  return (
-    <div className="grid md:grid-cols-2 gap-6">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div
-          key={i}
-          className="border rounded-xl p-5 animate-pulse bg-white"
-        >
-          <div className="h-4 bg-gray-200 mb-3 w-3/4 rounded"></div>
-          <div className="h-3 bg-gray-200 mb-2 rounded"></div>
-          <div className="h-3 bg-gray-200 w-1/2 rounded"></div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-/* 💰 AD COMPONENT (PRO STYLE) */
-function AdBlock() {
-  return (
-    <div className="md:col-span-2">
-      <div className="border rounded-xl p-6 bg-gray-50 text-center">
-
-        <p className="text-[10px] uppercase text-gray-400 mb-2 tracking-wider">
-          Sponsored
-        </p>
-
-        <div className="h-28 flex items-center justify-center text-gray-500 text-sm">
-          Ad Space (Responsive Banner)
-        </div>
+        </aside>
 
       </div>
+
     </div>
   )
 }

@@ -2,7 +2,7 @@ export default function SeoContent() {
   return (
     <article className="prose max-w-none">
       
-      <h1>Schema Markup Validator – Free JSON-LD Structured Data Testing Tool</h1>
+      <h2>Schema Markup Validator – Free JSON-LD Structured Data Testing Tool</h2>
 
       <p>
         The Schema Markup Validator is a powerful and easy-to-use online tool designed to help developers, SEO professionals, and website owners validate structured data quickly and accurately. Whether you are working with JSON-LD, Microdata, or RDFa, this tool allows you to test your schema markup and identify errors instantly.
@@ -43,7 +43,7 @@ export default function SeoContent() {
       </p>
 
       <ol>
-        <li>Paste your JSON-LD structured data or enter a webpage URL</li>
+        <li>Paste your JSON-LD structured data, or a page&apos;s full HTML source</li>
         <li>Click on the "Validate Schema" button</li>
         <li>View detected schema types and validation results</li>
         <li>Check for missing fields or errors</li>
@@ -131,7 +131,7 @@ export default function SeoContent() {
 
       <ul>
         <li>Instant validation results</li>
-        <li>Supports both JSON input and URL testing</li>
+        <li>Supports JSON-LD input and pasted page HTML</li>
         <li>Identifies missing fields and errors</li>
         <li>User-friendly interface</li>
         <li>No login or installation required</li>
@@ -176,7 +176,8 @@ export default function SeoContent() {
 
       <h3>Can I validate a live website?</h3>
       <p>
-        Yes, you can enter a URL and validate schema markup directly from a live webpage.
+        Yes. Open the page, view its source (Ctrl+U in most browsers), copy all of it and paste it into the
+        &quot;Page HTML&quot; tab. Every JSON-LD block on the page is extracted and checked in your browser.
       </p>
 
       <h2>Conclusion</h2>

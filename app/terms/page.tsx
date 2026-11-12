@@ -1,3 +1,13 @@
+import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/site"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Terms & Conditions",
+  description:
+    "Terms and conditions for using DevUtilities Lab tools and website.",
+  path: "/terms",
+})
+
 export default function TermsPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 space-y-8">
@@ -16,7 +26,7 @@ export default function TermsPage() {
       </h2>
 
       <p>
-        All tools provided on MockAPIs are free to use for educational
+        All tools provided on DevUtilities Lab are free to use for educational
         and development purposes.
       </p>
 
@@ -34,7 +44,7 @@ export default function TermsPage() {
       </h2>
 
       <p>
-        MockAPIs will not be liable for any losses or damages
+        DevUtilities Lab will not be liable for any losses or damages
         arising from the use of this website.
       </p>
 

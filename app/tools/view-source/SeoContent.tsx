@@ -22,13 +22,13 @@ export default function SeoContent() {
       {/* 🔥 FEATURES */}
       <h3>Key Features of the HTML Beautifier Tool</h3>
       <ul>
-        <li>Fetch HTML source code from any live website</li>
+        <li>Paste the HTML source of any page (Ctrl+U in your browser)</li>
         <li>Beautify and format messy HTML instantly</li>
         <li>Analyze SEO elements like headings and meta tags</li>
         <li>Extract internal and external links</li>
         <li>Identify missing image alt attributes</li>
         <li>Download formatted HTML code</li>
-        <li>Share results via URL</li>
+        <li>Share short HTML snippets via a link</li>
       </ul>
 
       {/* 🔥 WHY USE */}
@@ -48,8 +48,8 @@ export default function SeoContent() {
       {/* 🔥 HOW IT WORKS */}
       <h3>How to View and Beautify HTML Source Code</h3>
       <ol>
-        <li>Enter a website URL or paste raw HTML code</li>
-        <li>Click on "Fetch Source" to retrieve the page</li>
+        <li>Open the page in your browser and view its source (Ctrl+U, or ⌘⌥U on Mac)</li>
+        <li>Copy the source and paste it into the HTML box</li>
         <li>Instantly view formatted HTML output</li>
         <li>Analyze insights like headings, links, and images</li>
         <li>Copy or download the beautified code</li>
@@ -66,7 +66,7 @@ export default function SeoContent() {
         <li>Missing or duplicate H1 tags</li>
         <li>Incorrect heading hierarchy (H1 → H2 → H3)</li>
         <li>Missing meta descriptions</li>
-        <li>Broken or excessive external links</li>
+        <li>How many internal and external links a page has</li>
         <li>Images without alt attributes</li>
       </ul>
 
@@ -104,8 +104,8 @@ export default function SeoContent() {
       <details>
         <summary>Can I view source code of any website?</summary>
         <p>
-          You can fetch most publicly accessible websites. Some sites may block
-          automated requests for security reasons.
+          Yes. Open the page, view its source in your browser (Ctrl+U), and paste
+          it here. Fetching pages by URL is not available yet.
         </p>
       </details>
 
@@ -151,7 +151,7 @@ export default function SeoContent() {
                   name: "Can I view source code of any website?",
                   acceptedAnswer: {
                     "@type": "Answer",
-                    text: "Most public websites are supported, but some may block automated access.",
+                    text: "Yes. Open the page, view its source in your browser (Ctrl+U), and paste it here. Fetching pages by URL is not available yet.",
                   },
                 },
                 {

@@ -1,10 +1,13 @@
+import type { Metadata } from "next"
 import ToolClient from "./ToolClient"
 import SeoContent from "./SeoContent"
+import { pageMetadata } from "@/lib/site"
 
-export const metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "View Page Source Online & HTML Beautifier Tool (Free)",
   description:
-    "View, analyze, and beautify HTML source code of any website instantly. Free online HTML formatter with SEO insights, meta tags, headings, and structure analysis.",
+    "Beautify pasted HTML source, preview it safely, and inspect its structure, meta tags, headings and links. Free online HTML formatter that runs in your browser.",
+  path: "/tools/view-source",
   keywords: [
     "view page source online",
     "html beautifier",
@@ -13,22 +16,7 @@ export const metadata = {
     "beautify html online",
     "view website source",
   ],
-  alternates: {
-    canonical: "https://yourdomain.com/tools/view-source",
-  },
-  openGraph: {
-    title: "HTML Beautifier & View Source Tool",
-    description:
-      "Beautify and analyze HTML instantly with SEO insights and structured output.",
-    url: "https://yourdomain.com/tools/view-source",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "View Page Source Tool",
-    description: "Beautify and analyze HTML instantly",
-  },
-}
+})
 
 export default function Page() {
   return (

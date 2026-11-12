@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { tools } from "@/data/tools"
+import { tools, isLive } from "@/data/tools"
 
 interface Props {
 currentSlug: string
@@ -8,7 +8,7 @@ currentSlug: string
 export default function ToolRelated({ currentSlug }: Props) {
 
 const related = tools
-.filter((tool) => tool.slug !== currentSlug)
+.filter((tool) => tool.slug !== currentSlug && isLive(tool))
 .slice(0, 6)
 
 return ( <div className="mt-16">

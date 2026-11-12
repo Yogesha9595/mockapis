@@ -1,14 +1,17 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { calculators } from "@/data/calculators";
+import { pageMetadata } from "@/lib/site";
 
 // ✅ Force static (Cloudflare safe)
 export const dynamic = "force-static";
 
 // ✅ SEO Metadata (improved)
-export const metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Free Online Calculators – Fast & Accurate Tools",
   description:
     "Explore free online calculators for finance, health, math, and more. Fast, accurate, and easy-to-use tools like BMI, EMI, age, and percentage calculators.",
+  path: "/calculators",
   keywords: [
     "free calculators",
     "online calculator",
@@ -17,7 +20,7 @@ export const metadata = {
     "loan calculator",
     "percentage calculator",
   ],
-};
+});
 
 // ✅ Types (future-proof)
 type Calculator = {

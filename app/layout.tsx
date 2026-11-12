@@ -4,19 +4,21 @@ import { Inter } from "next/font/google";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from "@/lib/site";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   preload: true,
+  variable: "--font-inter", // consumed by --font-sans in app/globals.css
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://devutilitieslab.com"),
+  metadataBase: new URL(SITE_URL),
 
   title: {
-    default: "DevUtilities Lab – Free Developer Tools & Utilities",
-    template: "%s | DevUtilities Lab",
+    default: `${SITE_NAME} – Free Developer Tools & Utilities`,
+    template: `%s | ${SITE_NAME}`,
   },
 
   description:
@@ -34,37 +36,30 @@ export const metadata: Metadata = {
     "json validator",
   ],
 
-  authors: [{ name: "DevUtilities Lab Team" }],
-  creator: "DevUtilities Lab",
-  publisher: "DevUtilities Lab",
+  authors: [{ name: `${SITE_NAME} Team` }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
 
-  alternates: {
-    canonical: "/",
-  },
+  // NOTE: no `alternates.canonical` or `openGraph.url` here on purpose.
+  // Values set in the root layout are inherited by every page that doesn't
+  // override them, which previously made every page canonicalize to "/".
+  // Pages declare their own canonical via `pageMetadata()` in lib/site.ts.
 
   openGraph: {
     type: "website",
-    url: "https://devutilitieslab.com",
-    siteName: "DevUtilities Lab",
-    title: "DevUtilities Lab – Free Developer Tools & Utilities",
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} – Free Developer Tools & Utilities`,
     description:
       "All-in-one platform for developers: mock APIs, JSON tools, compilers, converters, and more.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "DevUtilities Lab",
-      },
-    ],
+    images: [{ url: DEFAULT_OG_IMAGE, alt: SITE_NAME }],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "DevUtilities Lab – Free Developer Tools",
+    title: `${SITE_NAME} – Free Developer Tools`,
     description:
       "Free developer tools including mock APIs, JSON tools, compilers, and converters.",
-    images: ["/og-image.png"],
+    images: [DEFAULT_OG_IMAGE],
   },
 
   robots: {
@@ -93,7 +88,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
-  themeColor: "#020617", // ✅ match dark theme
+  themeColor: "#f9fafb", // matches --background (light is the default theme)
 };
 
 export default function RootLayout({
@@ -104,32 +99,24 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* ✅ DARK MODE INIT (NO FLICKER) */}
+        {/* THEME INIT (runs before paint, no flicker). Light is the default;
+            dark applies only when the visitor chose it with the toggle.
+            Keep in sync with components/ThemeToggle.tsx. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-              (function () {
-                try {
-                  const stored = localStorage.getItem('theme');
-                  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  if (stored === 'dark' || (!stored && prefersDark)) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {}
-              })();
-            `,
+            __html: `(function(){try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}})();`,
           }}
         />
       </head>
 
       <body
-        className={`${inter.className} min-h-screen flex flex-col bg-background text-foreground antialiased overflow-x-hidden`}
+        className={`${inter.className} ${inter.variable} min-h-screen flex flex-col bg-background text-foreground antialiased overflow-x-hidden`}
       >
         {/* HEADER */}
         <Header />
 
         {/* MAIN */}
-        <main className="flex-grow w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-20">
+        <main id="main-content" tabIndex={-1} className="flex-grow w-full focus:outline-none max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-20">
           {children}
         </main>
 

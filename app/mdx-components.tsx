@@ -1,15 +1,35 @@
 import type { MDXComponents } from "mdx/types"
-import CodeBlock from "@/components/CodeBlock" // ✅ FIXED PATH
+import CodeBlock from "@/components/CodeBlock"
 
-/* ✅ Helper: slug generator (robust) */
-function slugify(text: unknown) {
-  if (!text) return ""
-  return String(text)
+/* ---------------- HELPERS ---------------- */
+
+/* ✅ Extract plain text from React children */
+function extractText(children: any): string {
+  if (!children) return ""
+
+  if (typeof children === "string") return children
+
+  if (Array.isArray(children)) {
+    return children.map(extractText).join("")
+  }
+
+  if (typeof children === "object" && children.props?.children) {
+    return extractText(children.props.children)
+  }
+
+  return ""
+}
+
+/* ✅ Robust slug generator */
+function slugify(text: string) {
+  return text
     .toLowerCase()
     .replace(/[^\w\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-")
 }
+
+/* ---------------- EXPORT ---------------- */
 
 export function useMDXComponents(
   components: MDXComponents
@@ -17,42 +37,65 @@ export function useMDXComponents(
   return {
     /* ---------------- HEADINGS ---------------- */
 
-    h1: (props) => (
-      <h1
-        id={slugify(props.children)}
-        className="text-3xl font-bold mt-10 mb-4 scroll-mt-24"
-        {...props}
-      />
-    ),
+    h1: ({ children, ...props }) => {
+      const text = extractText(children)
+      const id = slugify(text)
 
-    h2: (props) => (
-      <h2
-        id={slugify(props.children)}
-        className="text-2xl font-semibold mt-10 mb-4 scroll-mt-24 border-b pb-2"
-        {...props}
-      />
-    ),
+      return (
+        <h1
+          id={id}
+          className="text-3xl font-bold mt-10 mb-4 scroll-mt-24"
+          {...props}
+        >
+          {children}
+        </h1>
+      )
+    },
 
-    h3: (props) => (
-      <h3
-        id={slugify(props.children)}
-        className="text-xl font-semibold mt-8 mb-3 scroll-mt-24"
-        {...props}
-      />
-    ),
+    /* ✅ ONLY THIS WILL BE USED IN TOC */
+    h2: ({ children, ...props }) => {
+      const text = extractText(children)
+      const id = slugify(text)
+
+      return (
+        <h2
+          id={id}
+          data-toc="true" /* 🔥 IMPORTANT FOR TOC */
+          className="text-2xl font-semibold mt-12 mb-4 scroll-mt-24 border-b pb-2"
+          {...props}
+        >
+          {children}
+        </h2>
+      )
+    },
+
+    h3: ({ children, ...props }) => {
+      const text = extractText(children)
+      const id = slugify(text)
+
+      return (
+        <h3
+          id={id}
+          className="text-xl font-semibold mt-8 mb-3 scroll-mt-24"
+          {...props}
+        >
+          {children}
+        </h3>
+      )
+    },
 
     /* ---------------- TEXT ---------------- */
 
     p: (props) => (
-      <p className="text-gray-700 leading-7 mb-5 text-[17px]" {...props} />
+      <p className="text-gray-700 dark:text-gray-300 leading-7 mb-5 text-[17px]" {...props} />
     ),
 
     ul: (props) => (
-      <ul className="list-disc pl-6 mb-5 text-gray-700 space-y-1" {...props} />
+      <ul className="list-disc pl-6 mb-5 text-gray-700 dark:text-gray-300 space-y-1" {...props} />
     ),
 
     ol: (props) => (
-      <ol className="list-decimal pl-6 mb-5 text-gray-700 space-y-1" {...props} />
+      <ol className="list-decimal pl-6 mb-5 text-gray-700 dark:text-gray-300 space-y-1" {...props} />
     ),
 
     li: (props) => <li {...props} />,
@@ -66,16 +109,16 @@ export function useMDXComponents(
 
     blockquote: (props) => (
       <blockquote
-        className="border-l-4 border-blue-500 pl-4 italic text-gray-600 my-6"
+        className="border-l-4 border-blue-500 pl-4 italic text-gray-600 dark:text-gray-400 my-6"
         {...props}
       />
     ),
 
     /* ---------------- INLINE CODE ---------------- */
 
-    code: ({ children, ...props }: { children: React.ReactNode }) => (
+    code: ({ children, ...props }: any) => (
       <code
-        className="bg-gray-100 px-1.5 py-0.5 rounded text-sm text-pink-600"
+        className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm text-pink-600 dark:text-pink-400"
         {...props}
       >
         {children}
@@ -105,16 +148,16 @@ export function useMDXComponents(
 
     table: (props) => (
       <div className="overflow-x-auto my-6">
-        <table className="w-full border border-gray-200" {...props} />
+        <table className="w-full border border-gray-200 dark:border-gray-700 text-sm" {...props} />
       </div>
     ),
 
     th: (props) => (
-      <th className="border px-3 py-2 bg-gray-100 text-left" {...props} />
+      <th className="border px-3 py-2 bg-gray-100 dark:bg-gray-800 text-left" {...props} />
     ),
 
     td: (props) => (
-      <td className="border px-3 py-2" {...props} />
+      <td className="border px-3 py-2 dark:border-gray-700" {...props} />
     ),
 
     /* ---------------- IMAGE ---------------- */

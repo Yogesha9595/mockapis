@@ -1,165 +1,92 @@
-"use client"
-
 import Link from "next/link"
-import { Send, Globe } from "lucide-react"
-import { FaGithub, FaLinkedin, FaFacebook } from "react-icons/fa"
-import { motion } from "framer-motion"
+import { FaGithub, FaTelegramPlane } from "react-icons/fa"
+import { navCategories, COMPANY_LINKS, LEGAL_LINKS, RESOURCE_LINKS } from "./nav/navData"
+import { SITE_NAME } from "@/lib/site"
+
+/* Server component: no client JavaScript. Every link points to a real page. */
+
+/* Only accounts verified to exist (2026-11-12). */
+const SOCIAL = [
+  { href: "https://github.com/devutilitieslab", label: "DevUtilities Lab on GitHub", icon: FaGithub },
+  { href: "https://t.me/devutilities_lab", label: "DevUtilities Lab on Telegram", icon: FaTelegramPlane },
+]
+
+const linkClass = "text-sm text-muted transition-colors hover:text-foreground"
+
+/** Internal page → next/link. Non-page files (sitemap.xml) → plain <a>, so no client-side navigation is attempted. */
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return /\.[a-z]+$/.test(href) ? (
+    <a href={href} className={linkClass}>{children}</a>
+  ) : (
+    <Link href={href} className={linkClass}>{children}</Link>
+  )
+}
+
+function Column({ title, links }: { title: string; links: { href: string; label: string }[] }) {
+  return (
+    <div>
+      <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+      <ul className="mt-3 space-y-2">
+        {links.map((l) => (
+          <li key={l.href}>
+            <FooterLink href={l.href}>{l.label}</FooterLink>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 export default function Footer() {
-  const fadeUp = {
-    hidden: { opacity: 0, y: 20 },
-    show: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { delay: i * 0.1, duration: 0.4 }
-    })
-  }
+  // A category without its own page links straight to its single tool
+  const categoryLinks = navCategories().map((c) => ({
+    href: c.href ?? c.tools[0].href,
+    label: c.href ? c.name : c.tools[0].name,
+  }))
 
   return (
-    <footer className="bg-gradient-to-b from-[#0b0f19] to-black text-gray-400 mt-20 border-t border-gray-800">
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14">
-
-        {/* GRID */}
-        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
+    <footer className="mt-20 border-t border-border bg-card">
+      <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
 
           {/* BRAND */}
-          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={0}>
-            <h3 className="text-white text-xl font-bold mb-3">
-              DevUtilities Lab 🚀
-            </h3>
-
-            <p className="text-sm leading-relaxed">
-              Free developer tools to build faster ⚡  
-              Mock APIs • JSON Tools • Converters • Compilers  
+          <div className="sm:col-span-2">
+            <Link href="/" className="text-lg font-bold tracking-tight text-foreground">{SITE_NAME}</Link>
+            <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted">
+              Free, fast developer tools for working with JSON, encodings, tokens, timestamps and text. They run in
+              your browser, with no sign-up.
             </p>
-
-            {/* SOCIAL */}
-            <div className="flex gap-3 mt-5">
-
-              {[{
-                icon: <Globe size={18} />,
-                href: "https://devutilitieslab.com"
-              },{
-                icon: <Send size={18} />,
-                href: "https://t.me/devutilities_lab",
-                extra: "hover:bg-[#229ED9]/20"
-              },{
-                icon: <FaGithub size={16} />,
-                href: "https://github.com/devutilitieslab"
-              },{
-                icon: <FaLinkedin size={16} />,
-                href: "https://linkedin.com/company/devutilitieslab",
-                extra: "hover:bg-[#0A66C2]/20"
-              },{
-                icon: <FaFacebook size={16} />,
-                href: "https://facebook.com/devutilitieslab",
-                extra: "hover:bg-[#1877F2]/20"
-              }].map((item, i) => (
-                <motion.a
-                  key={i}
-                  href={item.href}
-                  target="_blank"
-                  whileHover={{ scale: 1.15, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`icon transition-all duration-300 ${item.extra || ""}`}
-                >
-                  {item.icon}
-                </motion.a>
+            <ul className="mt-4 flex gap-2" aria-label="Social media">
+              {SOCIAL.map(({ href, label, icon: Icon }) => (
+                <li key={href}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${label} (opens in a new tab)`}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-control border border-border text-muted transition-colors hover:bg-surface hover:text-foreground"
+                  >
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  </a>
+                </li>
               ))}
-
-            </div>
-          </motion.div>
-
-          {/* LINKS */}
-          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={1}>
-            <h3 className="text-white font-semibold mb-3">Tools</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link className="hover:text-white transition" href="/tools">All Tools</Link></li>
-              <li><Link className="hover:text-white transition" href="/mock-api">Mock APIs</Link></li>
-              <li><Link className="hover:text-white transition" href="/json-tools">JSON Tools</Link></li>
             </ul>
-          </motion.div>
-
-          {/* RESOURCES */}
-          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={2}>
-            <h3 className="text-white text-sm font-semibold mb-3 uppercase">Resources</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link className="hover:text-white transition" href="/blog">Blog</Link></li>
-              <li><Link className="hover:text-white transition" href="/docs">Documentation</Link></li>
-              <li><Link className="hover:text-white transition" href="/learn">Learn</Link></li>
-            </ul>
-          </motion.div>
-
-          {/* LEGAL */}
-          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={3}>
-            <h3 className="text-white text-sm font-semibold mb-3 uppercase">Legal</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link className="hover:text-white transition" href="/about">About</Link></li>
-              <li><Link className="hover:text-white transition" href="/contact">Contact</Link></li>
-              <li><Link className="hover:text-white transition" href="/privacy-policy">Privacy Policy</Link></li>
-              <li><Link className="hover:text-white transition" href="/terms">Terms & Conditions</Link></li>
-              <li><Link className="hover:text-white transition" href="/disclaimer">Disclaimer</Link></li>
-              <li><Link className="hover:text-white transition" href="/cookie-policy">Cookie Policy</Link></li>
-            </ul>
-          </motion.div>
-
-        </div>
-
-        {/* CTA */}
-        <motion.div
-          className="mt-14"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-        >
-          <div className="relative bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-gray-800 rounded-xl p-6 text-center backdrop-blur overflow-hidden">
-
-            {/* subtle glow */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-2xl opacity-40" />
-
-            <h4 className="relative text-white text-lg font-semibold mb-2">
-              🚀 Build Faster with DevUtilities
-            </h4>
-
-            <p className="relative text-sm text-gray-400 mb-4">
-              Free tools. No login. Built for developers.
-            </p>
-
-            <div className="relative flex flex-col sm:flex-row justify-center gap-3">
-
-              <motion.a
-                href="/"
-                whileHover={{ scale: 1.05 }}
-                className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg text-sm shadow"
-              >
-                Explore Tools
-              </motion.a>
-
-              <motion.a
-                href="https://t.me/devutilities_lab"
-                target="_blank"
-                whileHover={{ scale: 1.05 }}
-                className="border border-gray-600 hover:border-white px-5 py-2 rounded-lg text-sm"
-              >
-                Join Telegram
-              </motion.a>
-
-            </div>
           </div>
-        </motion.div>
 
-        {/* EMAIL */}
-        <div className="text-center text-sm text-gray-500 mt-10">
-          hello@devutilitieslab.com
+          <nav aria-label="Footer" className="grid gap-10 sm:col-span-2 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-4">
+            <Column title="Tool categories" links={[...categoryLinks, { href: "/tools", label: "All tools" }]} />
+            <Column title="Resources" links={RESOURCE_LINKS} />
+            <Column title="Company" links={COMPANY_LINKS} />
+            <Column title="Legal" links={LEGAL_LINKS} />
+          </nav>
         </div>
 
-        {/* COPYRIGHT */}
-        <div className="border-t border-gray-800 mt-8 pt-6 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} DevUtilities Lab 🚀
+        <div className="mt-10 flex flex-col gap-2 border-t border-border pt-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} {SITE_NAME}</p>
+          <p>
+            Contact: <a href="mailto:hello@devutilitieslab.com" className="hover:text-foreground">hello@devutilitieslab.com</a>
+          </p>
         </div>
-
       </div>
     </footer>
   )

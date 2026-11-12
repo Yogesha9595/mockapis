@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 
 const apiExamples = [
-`$ curl https://mockapis.dev/api/users/1
+`$ curl https://devutilitieslab.com/api/users/1
 
 {
   "id": 1,
@@ -12,7 +12,7 @@ const apiExamples = [
   "role": "Developer"
 }`,
 
-`$ curl https://mockapis.dev/api/products
+`$ curl https://devutilitieslab.com/api/products
 
 [
   {
@@ -22,7 +22,7 @@ const apiExamples = [
   }
 ]`,
 
-`$ curl https://mockapis.dev/api/orders/501
+`$ curl https://devutilitieslab.com/api/orders/501
 
 {
   "orderId": 501,

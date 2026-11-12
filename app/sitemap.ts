@@ -1,79 +1,88 @@
 import type { MetadataRoute } from "next"
-import fs from "fs"
-import path from "path"
 import { units } from "@/data/units"
+import { calculatorConfig } from "@/config/calculators"
+import { getAllArticles } from "@/lib/blog/getAllArticles"
+import { absoluteUrl } from "@/lib/site"
+import { tools, standaloneTools, isLive } from "@/data/tools"
 
-// ✅ REQUIRED for static export
+// ✅ Prerendered at build time
 export const dynamic = "force-static"
 
+/**
+ * Only URLs that render real, working content belong here.
+ *
+ * Deliberately excluded until they are functional (they still exist as
+ * routes — exclusion from the sitemap does not remove or de-index them):
+ *  - /tools/[slug] pages and categories whose status isn't "live" (they are noindex)
+ *  - /compiler/* and /online-compiler (the run API is not deployed)
+ *  - /calculators/* without an implementation ("Coming soon")
+ *  - /playground, /apis, /docs/* (depend on mock API routes that are not deployed)
+ *  - unit slugs containing "/" (e.g. m/s), which cannot form a valid path segment
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://mockapis.in"
-
   const urls: MetadataRoute.Sitemap = []
 
-  const now = new Date()
-
   /* ---------------- STATIC PAGES ---------------- */
+  const staticRoutes = [
+    "/",
+    "/tools",
+    "/learn",
+    "/calculators",
+    "/http-status-codes",
+    "/about",
+    "/contact",
+    "/privacy-policy",
+    "/terms",
+    "/disclaimer",
+  ]
 
-  const staticRoutes = ["", "/learn", "/unit-converter"]
-
-  staticRoutes.forEach((route) => {
-    urls.push({
-      url: `${baseUrl}${route}`,
-      lastModified: now,
-    })
-  })
-
-  /* ---------------- MDX CONTENT ---------------- */
-
-  try {
-    const contentDir = path.join(process.cwd(), "content")
-
-    if (fs.existsSync(contentDir)) {
-      const files = fs.readdirSync(contentDir)
-
-      files
-        .filter((file) => file.endsWith(".mdx"))
-        .forEach((file) => {
-          urls.push({
-            url: `${baseUrl}/learn/${file.replace(".mdx", "")}`,
-            lastModified: now,
-          })
-        })
-    }
-  } catch {
-    // ✅ fail-safe (important for build)
+  for (const route of staticRoutes) {
+    urls.push({ url: absoluteUrl(route) })
   }
 
-  /* ---------------- CATEGORY PAGES ---------------- */
+  /* ---------------- WORKING STANDALONE TOOLS ---------------- */
+  for (const tool of standaloneTools.filter(isLive)) {
+    urls.push({ url: absoluteUrl(tool.href) })
+  }
 
-  Object.keys(units).forEach((category) => {
+  /* ---------------- WORKING GENERIC TOOLS + THEIR CATEGORIES ---------------- */
+  const liveTools = tools.filter(isLive)
+
+  for (const tool of liveTools) {
+    urls.push({ url: absoluteUrl(`/tools/${tool.slug}`) })
+  }
+
+  for (const category of new Set(liveTools.map((t) => t.category))) {
+    urls.push({ url: absoluteUrl(`/tools/category/${category}`) })
+  }
+
+  /* ---------------- LEARN ARTICLES ---------------- */
+  for (const article of getAllArticles()) {
+    const date = new Date(article.date)
     urls.push({
-      url: `${baseUrl}/converters/${category}`,
-      lastModified: now,
+      url: absoluteUrl(`/learn/${article.slug}`),
+      ...(isNaN(date.getTime()) ? {} : { lastModified: date }),
     })
-  })
+  }
 
-  /* ---------------- CONVERSION PAGES ---------------- */
+  /* ---------------- IMPLEMENTED CALCULATORS ---------------- */
+  for (const slug of Object.keys(calculatorConfig)) {
+    urls.push({ url: absoluteUrl(`/calculators/${slug}`) })
+  }
 
-  Object.keys(units).forEach((category) => {
-    const group = units[category as keyof typeof units]
+  /* ---------------- UNIT CONVERTERS ---------------- */
+  for (const category of Object.keys(units)) {
+    urls.push({ url: absoluteUrl(`/converters/${category}`) })
 
-    if (!group || typeof group !== "object") return
+    const unitList = Object.keys(units[category as keyof typeof units])
 
-    const unitList = Object.keys(group)
-
-    unitList.forEach((from) => {
-      unitList.forEach((to) => {
-        if (from === to) return
-
-        urls.push({
-          url: `${baseUrl}/convert/${from}-to-${to}`,
-          lastModified: now,
-        })
-      })
-    })
-  })
+    for (const from of unitList) {
+      for (const to of unitList) {
+        if (from === to || from.includes("/") || to.includes("/")) continue
+        urls.push({ url: absoluteUrl(`/convert/${from}-to-${to}`) })
+      }
+    }
+  }
 
   return urls
 }

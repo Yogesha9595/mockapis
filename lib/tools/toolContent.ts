@@ -94,7 +94,7 @@ Unlike many online utilities, this formatter runs entirely in your browser, ensu
       },
       {
         question: "Is this JSON formatter free?",
-        answer: "Yes. All developer tools on MockAPIs are completely free to use.",
+        answer: "Yes. All developer tools on DevUtilities Lab are completely free to use.",
       },
     ],
   },
@@ -120,8 +120,8 @@ This tool simplifies the conversion process by transforming JSON structures into
     ],
 
     example: {
-      input: `{"name":"MockAPIs","version":1}`,
-      output: `name: MockAPIs
+      input: `{"name":"DevUtilities Lab","version":1}`,
+      output: `name: DevUtilities Lab
 version: 1`,
     },
 

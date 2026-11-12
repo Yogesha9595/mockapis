@@ -1,3 +1,13 @@
+import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/site"
+
+export const metadata: Metadata = pageMetadata({
+  title: "API Documentation",
+  description:
+    "Documentation for DevUtilities Lab mock APIs, API playground, endpoints, and HTTP status codes.",
+  path: "/docs",
+})
+
 import Link from "next/link"
 
 export default function Docs() {
@@ -9,7 +19,7 @@ export default function Docs() {
       </h1>
 
       <p className="text-gray-600 mb-10">
-        Explore the MockAPIs platform. Test endpoints, learn API concepts,
+        Explore the DevUtilities Lab platform. Test endpoints, learn API concepts,
         and use our mock APIs for development and testing.
       </p>
 

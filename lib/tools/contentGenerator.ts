@@ -63,7 +63,7 @@ answer: `${toolName} is an online developer utility that allows you to process a
 },
 {
 question: `Is ${toolName} free to use?`,
-answer: "Yes. All developer tools available on MockAPIs are completely free to use."
+answer: "Yes. All developer tools available on DevUtilities Lab are completely free to use."
 },
 {
 question: `Is my data secure when using ${toolName}?`,

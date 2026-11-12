@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { calculatorConfig } from "@/config/calculators";
+import { pageMetadata } from "@/lib/site";
 import CalculatorRenderer from "@/components/calculators/systems/CalculatorRenderer";
 
 // ✅ Static export
@@ -26,10 +27,11 @@ export async function generateMetadata({
     };
   }
 
-  return {
+  return pageMetadata({
     title: `${calc.name} – Free Online Calculator`,
     description: `Use ${calc.name} instantly with charts & insights.`,
-  };
+    path: `/calculators/${calc.slug}`,
+  });
 }
 
 export default async function CalculatorPage({

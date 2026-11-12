@@ -1,22 +1,19 @@
 import { Suspense } from "react"
 import ClientTool from "./ClientTool"
 import type { Metadata } from "next"
+import { absoluteUrl, pageMetadata } from "@/lib/site"
 
 /* ✅ STATIC EXPORT SAFE */
 export const dynamic = "force-static"
 
-/* ✅ NEXT-LEVEL SEO METADATA */
-export const metadata: Metadata = {
-  metadataBase: new URL("https://mockapis.in"),
+const PATH = "/tools/url-encoder-decoder"
 
-  title: {
-    default: "URL Encoder & Decoder Tool – Free Online Encode/Decode",
-    template: "%s | Mock APIs",
-  },
-
+/* ✅ SEO METADATA (root template appends " | DevUtilities Lab") */
+export const metadata: Metadata = pageMetadata({
+  title: "URL Encoder & Decoder Tool – Free Online Encode/Decode",
   description:
     "Free URL encoder and decoder tool. Encode URLs, decode query strings, and convert special characters instantly online.",
-
+  path: PATH,
   keywords: [
     "url encoder",
     "url decoder",
@@ -25,41 +22,7 @@ export const metadata: Metadata = {
     "url encode javascript",
     "url decode tool",
   ],
-
-  alternates: {
-    canonical: "/tools/url-encoder-decoder",
-  },
-
-  openGraph: {
-    title: "URL Encoder & Decoder Tool",
-    description:
-      "Encode or decode URLs instantly online with our free developer tool.",
-    url: "/tools/url-encoder-decoder",
-    siteName: "Mock APIs",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "URL Encoder & Decoder Tool",
-      },
-    ],
-    type: "website",
-  },
-
-  twitter: {
-    card: "summary_large_image",
-    title: "URL Encoder & Decoder Tool",
-    description:
-      "Free online tool to encode and decode URLs instantly.",
-    images: ["/og-image.png"],
-  },
-
-  robots: {
-    index: true,
-    follow: true,
-  },
-}
+})
 
 /* ✅ Wrapper (safe for client hooks) */
 function ToolWrapper() {
@@ -86,19 +49,19 @@ export default function Page() {
                   "@type": "ListItem",
                   position: 1,
                   name: "Home",
-                  item: "https://mockapis.in",
+                  item: absoluteUrl("/"),
                 },
                 {
                   "@type": "ListItem",
                   position: 2,
                   name: "Tools",
-                  item: "https://mockapis.in/tools",
+                  item: absoluteUrl("/tools"),
                 },
                 {
                   "@type": "ListItem",
                   position: 3,
                   name: "URL Encoder & Decoder",
-                  item: "https://mockapis.in/tools/url-encoder-decoder",
+                  item: absoluteUrl(PATH),
                 },
               ],
             },
@@ -106,7 +69,7 @@ export default function Page() {
               "@context": "https://schema.org",
               "@type": "WebApplication",
               name: "URL Encoder & Decoder Tool",
-              url: "https://mockapis.in/tools/url-encoder-decoder",
+              url: absoluteUrl(PATH),
               applicationCategory: "DeveloperApplication",
               operatingSystem: "All",
               description:

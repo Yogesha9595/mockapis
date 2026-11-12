@@ -17,7 +17,7 @@ a: `${toolName} is an online developer utility that helps process, format, valid
 },
 {
 q: `Is ${toolName} free to use?`,
-a: `Yes. All tools available on MockAPIs are completely free to use for developers, students, and engineers.`
+a: `Yes. All tools available on DevUtilities Lab are completely free to use for developers, students, and engineers.`
 },
 {
 q: `Is my data secure when using ${toolName}?`,

@@ -1,3 +1,13 @@
+import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/site"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Privacy Policy",
+  description:
+    "Privacy policy for DevUtilities Lab explaining what information is collected and how it is used.",
+  path: "/privacy-policy",
+})
+
 export default function PrivacyPolicy() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 space-y-10 bg-black text-white">

@@ -1,3 +1,13 @@
+import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/site"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Disclaimer",
+  description:
+    "Disclaimer for DevUtilities Lab: information and tools on this website are provided in good faith for general informational and educational purposes.",
+  path: "/disclaimer",
+})
+
 export default function Disclaimer() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 space-y-8">
@@ -12,7 +22,7 @@ export default function Disclaimer() {
       </p>
 
       <p>
-        MockAPIs does not make any warranties about the completeness,
+        DevUtilities Lab does not make any warranties about the completeness,
         reliability, or accuracy of this information.
       </p>
 

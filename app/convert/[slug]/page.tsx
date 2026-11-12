@@ -1,9 +1,14 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { units } from "@/data/units"
 import { convertUnit } from "@/lib/converterEngine"
+import { pageMetadata } from "@/lib/site"
 
 // ✅ REQUIRED FOR STATIC EXPORT
 export const dynamic = "force-static"
+
+// Only generated unit pairs exist; anything else is a real 404
+export const dynamicParams = false
 
 // ✅ GENERATE ALL STATIC ROUTES
 export async function generateStaticParams() {
@@ -33,13 +38,14 @@ export async function generateStaticParams() {
 // ✅ derive type from units
 type UnitCategory = keyof typeof units
 
+// ✅ Next.js 16: params and searchParams are Promises
 type PageProps = {
-  params: {
+  params: Promise<{
     slug: string
-  }
-  searchParams?: {
+  }>
+  searchParams?: Promise<{
     value?: string
-  }
+  }>
 }
 
 // ✅ Safe slug parsing
@@ -78,8 +84,9 @@ function getCategory(from: string, to: string): UnitCategory | null {
 }
 
 // 🔥 SEO Metadata
-export function generateMetadata({ params }: PageProps) {
-  const parsed = parseSlug(params.slug)
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const parsed = parseSlug(slug)
 
   if (!parsed) {
     return {
@@ -90,15 +97,18 @@ export function generateMetadata({ params }: PageProps) {
 
   const { from, to } = parsed
 
-  return {
+  return pageMetadata({
     title: `${from} to ${to} Converter – Free Online Tool`,
     description: `Convert ${from} to ${to} instantly using our free online unit converter.`,
-  }
+    path: `/convert/${slug}`,
+  })
 }
 
 // ✅ PAGE
-export default function ConvertPage({ params, searchParams }: PageProps) {
-  const parsed = parseSlug(params.slug)
+export default async function ConvertPage({ params, searchParams }: PageProps) {
+  const { slug } = await params
+  const query = (await searchParams) ?? {}
+  const parsed = parseSlug(slug)
 
   if (!parsed) {
     return (
@@ -113,7 +123,7 @@ export default function ConvertPage({ params, searchParams }: PageProps) {
   const { from: fromUnit, to: toUnit } = parsed
 
   // ✅ Safe number parsing
-  const inputValue = Number(searchParams?.value ?? 1)
+  const inputValue = Number(query.value ?? 1)
   const safeValue = isNaN(inputValue) ? 1 : inputValue
 
   const category = getCategory(fromUnit, toUnit)

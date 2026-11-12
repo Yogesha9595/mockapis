@@ -10,13 +10,11 @@ import { getRangeFromNode } from "@/lib/htmlPositionMapper"
 
 export default function ToolClient() {
   // 🔹 Core state
-  const [url, setUrl] = useState("")
   const [inputHtml, setInputHtml] = useState("")
   const [output, setOutput] = useState("")
   const [insights, setInsights] = useState<any>(null)
 
   // 🔹 UI state
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [copied, setCopied] = useState(false)
 
@@ -69,32 +67,16 @@ export default function ToolClient() {
     }, 400)
   }
 
-  // 🌐 Fetch
-  const fetchHtml = async () => {
-    if (!url.trim()) return setError("Enter a valid URL")
-
-    setLoading(true)
-    setError("")
-
-    try {
-      const res = await fetch("/api/fetch-html", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
-      })
-
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
-
-      setInputHtml(data.html)
-      processHtml(data.html)
-    } catch (err: any) {
-      setError(err.message)
-      setOutput("")
-    } finally {
-      setLoading(false)
+  // 🔗 Load HTML from a shared link (?input=...)
+  useEffect(() => {
+    const shared = new URLSearchParams(window.location.search).get("input")
+    if (shared) {
+      // The page is statically rendered, so the URL can only be read after mount
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setInputHtml(shared)
+      processHtml(shared)
     }
-  }
+  }, [processHtml])
 
   // 🎯 Node select
   const handleNodeSelect = (node: any) => {
@@ -183,27 +165,23 @@ export default function ToolClient() {
           View Page Source & HTML Beautifier
         </h1>
 
-        <div className="flex gap-3">
-          <input
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://example.com"
-            className="flex-1 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-          />
+        <p className="text-sm text-gray-600 mb-3">
+          Paste a page&apos;s HTML to beautify it, preview it safely and inspect its structure and SEO tags. To get a
+          live page&apos;s source, open it and press <kbd className="rounded border px-1">Ctrl</kbd>+<kbd className="rounded border px-1">U</kbd>{" "}
+          (<kbd className="rounded border px-1">⌘</kbd>+<kbd className="rounded border px-1">⌥</kbd>+<kbd className="rounded border px-1">U</kbd> on Mac), then copy everything.
+          Fetching a page by URL is not available yet.
+        </p>
 
-          <button
-            onClick={fetchHtml}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-lg text-sm"
-          >
-            {loading ? "Fetching..." : "Fetch"}
-          </button>
-        </div>
-
+        <label htmlFor="vs-input" className="block text-sm font-semibold mb-1">
+          HTML source
+        </label>
         <textarea
+          id="vs-input"
           value={inputHtml}
           onChange={(e) => handleInputChange(e.target.value)}
-          placeholder="Paste HTML..."
-          className="w-full mt-4 h-32 border rounded-lg p-3 text-sm"
+          placeholder="<!DOCTYPE html>…"
+          spellCheck={false}
+          className="w-full h-32 border rounded-lg p-3 text-sm font-mono focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         />
 
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}

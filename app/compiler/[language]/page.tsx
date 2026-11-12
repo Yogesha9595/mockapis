@@ -1,4 +1,6 @@
+import type { Metadata } from "next"
 import ClientCompiler from "./Client"
+import { pageMetadata } from "@/lib/site"
 import { languages } from "@/data/compilerLanguages"
 import Link from "next/link"
 import { notFound } from "next/navigation"
@@ -33,9 +35,17 @@ function getIcon(lang: string) {
     : "https://cdn-icons-png.flaticon.com/512/2721/2721297.png"
 }
 
-// ✅ METADATA (FIXED PARAMS ONLY)
-export async function generateMetadata({ params }: any) {
-  const { language } = params // ❗ FIXED (removed await)
+// Only languages in data/compilerLanguages.ts exist; anything else is a real 404
+export const dynamicParams = false
+
+// ✅ Next.js 16: params is a Promise
+type PageProps = {
+  params: Promise<{ language: string }>
+}
+
+// ✅ METADATA
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { language } = await params
   const data = languages[language]
 
   if (!data) {
@@ -46,8 +56,12 @@ export async function generateMetadata({ params }: any) {
   }
 
   return {
+    // Code execution is not deployed yet, so these pages stay out of search results
+    robots: { index: false, follow: true },
+    ...pageMetadata({
     title: `${data.name} Online Compiler (Free) – Run ${data.name} Code Online Instantly`,
     description: `Run ${data.name} code online instantly with our free ${data.name} compiler. No installation required. Supports input, fast execution, and real-time output.`,
+    path: `/compiler/${language}`,
     keywords: [
       `${data.name} online compiler`,
       `run ${data.name} code online`,
@@ -59,12 +73,13 @@ export async function generateMetadata({ params }: any) {
       `${data.name} coding platform`,
       `${data.name} code editor online`
     ]
+    }),
   }
 }
 
-// ✅ PAGE (ONLY PARAM FIX)
-export default async function Page({ params }: any) {
-  const { language } = params // ❗ FIXED (removed await)
+// ✅ PAGE
+export default async function Page({ params }: PageProps) {
+  const { language } = await params
   const data = languages[language]
 
   if (!data) return notFound()

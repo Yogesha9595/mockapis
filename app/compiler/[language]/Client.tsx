@@ -77,43 +77,18 @@ export default function ClientCompiler({ lang }: any) {
     }
   }, [isDragging])
 
-  // 🚀 RUN (FIXED OUTPUT BUG)
-  async function runCode() {
+  // 🚀 RUN
+  // Code execution needs a sandboxed execution backend (with size, time and
+  // rate limits). It is not deployed, so we say so instead of failing silently.
+  const EXECUTION_AVAILABLE = false
+
+  function runCode() {
     if (!currentFile) return
-
-    try {
-      setLoading(true)
-      setStdout("Running...")
-      setStderr("")
-      setInfo("")
-
-      const res = await fetch("/api/compiler/run", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code: currentFile.code,
-          language_id: config.id,
-          stdin: input
-        })
-      })
-
-      const data = await res.json()
-
-      // ✅ FIX: PROPER OUTPUT HANDLING
-      setStdout(data.output || data.stdout || "")
-      setStderr(data.stderr || data.compile_output || "")
-      setInfo(data.status || "")
-      setExecution({
-        time: data.time,
-        memory: data.memory
-      })
-
-    } catch {
-      setStdout("")
-      setStderr("Execution failed")
-    } finally {
-      setLoading(false)
-    }
+    setStdout("")
+    setStderr("")
+    setInfo(
+      "Running code is not available yet. You can still write, edit and download your code here."
+    )
   }
 
   // ✨ BEAUTIFY
@@ -245,7 +220,15 @@ export default function ClientCompiler({ lang }: any) {
               ✨
             </button>
 
-            <button onClick={runCode} className="px-3 py-1 bg-blue-600 rounded text-xs flex items-center gap-1">
+            {!EXECUTION_AVAILABLE && (
+              <span className="self-center text-xs text-zinc-400">Running code is not available yet</span>
+            )}
+            <button
+              onClick={runCode}
+              disabled={!EXECUTION_AVAILABLE}
+              title={EXECUTION_AVAILABLE ? "Run code" : "Running code is not available yet"}
+              className="px-3 py-1 bg-blue-600 rounded text-xs flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <FiPlay size={12}/> Run
             </button>
           </div>

@@ -1,3 +1,13 @@
+import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/site"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Mock API Endpoints",
+  description:
+    "Browse the mock REST API endpoints available on DevUtilities Lab for testing and learning API development.",
+  path: "/apis",
+})
+
 import EndpointCard from "@/components/EndpointCard"
 
 export default function APIs() {

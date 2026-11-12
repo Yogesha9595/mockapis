@@ -29,7 +29,7 @@ export default function SupportButton() {
 
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 text-sm bg-yellow-400 hover:bg-yellow-500 transition px-3 py-1 rounded font-medium"
+        className="flex items-center gap-1 text-sm bg-yellow-400 hover:bg-yellow-500 text-gray-900 transition px-3 py-1 rounded font-medium"
       >
         🎁 Support
       </button>
@@ -43,7 +43,7 @@ export default function SupportButton() {
           </p>
 
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-            If MockAPIs helped you, consider buying me a coffee.
+            If DevUtilities Lab helped you, consider buying me a coffee.
           </p>
 
           <div className="flex justify-center">

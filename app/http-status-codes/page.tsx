@@ -1,3 +1,13 @@
+import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/site"
+
+export const metadata: Metadata = pageMetadata({
+  title: "HTTP Status Codes Reference",
+  description:
+    "Learn common HTTP status codes used in APIs and web development, including 200, 201, 400, 401, 403, 404, and 500.",
+  path: "/http-status-codes",
+})
+
 const statusCodes = [
   { code: 200, title: "OK", description: "The request succeeded." },
   { code: 201, title: "Created", description: "The request succeeded and a resource was created." },

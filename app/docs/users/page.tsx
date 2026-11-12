@@ -1,3 +1,13 @@
+import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/site"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Users API Documentation",
+  description:
+    "Learn how to list, create, update, and delete users with the DevUtilities Lab mock Users API.",
+  path: "/docs/users",
+})
+
 import EndpointCard from "@/components/EndpointCard"
 
 export default function UsersDocs() {

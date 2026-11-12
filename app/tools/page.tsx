@@ -2,20 +2,16 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { tools } from "@/data/tools"
+import { tools, standaloneTools, isLive, type Tool, type StandaloneTool } from "@/data/tools"
 import { motion } from "framer-motion"
 
-type Tool = {
-  slug: string
-  name: string
-  description?: string
-  category?: string
-}
+/* Hand-built tools first, then the generic /tools/[slug] tools */
+const allTools: (Tool | StandaloneTool)[] = [...standaloneTools, ...tools]
 
-/* 🔥 STATIC TOOL PATHS */
-const STATIC_TOOL_PATHS: Record<string, string> = {
-  "view-source": "/tools/view-source",
-  "url-encoder-decoder": "/tools/url-encoder-decoder",
+/* Only working tools get a link; everything else stays "Coming soon" */
+function toolHref(tool: Tool | StandaloneTool): string | null {
+  if (!isLive(tool)) return null
+  return "href" in tool ? tool.href : `/tools/${tool.slug}`
 }
 
 export default function ToolsPage() {
@@ -33,9 +29,9 @@ export default function ToolsPage() {
 
   const filteredTools = useMemo(() => {
     const q = query.toLowerCase().trim()
-    if (!q) return tools as Tool[]
+    if (!q) return allTools
 
-    return (tools as Tool[]).filter((tool) =>
+    return allTools.filter((tool) =>
       tool.name?.toLowerCase().includes(q) ||
       tool.description?.toLowerCase().includes(q)
     )
@@ -100,7 +96,7 @@ export default function ToolsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
                 {categoryTools.map((tool) => {
-                  const path = STATIC_TOOL_PATHS[tool.slug]
+                  const path = toolHref(tool)
 
                   return (
                     <motion.div

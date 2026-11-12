@@ -1,3 +1,13 @@
+import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/site"
+
+export const metadata: Metadata = pageMetadata({
+  title: "Contact Us",
+  description:
+    "Get in touch with the DevUtilities Lab team for questions, feedback, bug reports, or feature requests.",
+  path: "/contact",
+})
+
 export default function ContactPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 space-y-16">
