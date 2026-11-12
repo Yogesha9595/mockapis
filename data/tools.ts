@@ -60,16 +60,16 @@ export const tools: Tool[] = [
 /* ---------------- HTML TOOLS ---------------- */
 
 { slug:"html-formatter", name:"HTML Formatter & Beautifier", description:"Format and beautify HTML code instantly.", category:"formatter", status:"planned"},
-// partial: only collapses whitespace; keeps comments and breaks <pre> content
-{ slug:"html-minify", name:"HTML Minifier Tool", description:"Minify HTML code to reduce size.", category:"formatter", status:"partial"},
+// live: lib/tools/htmlMinify.ts — unit-tested; browser-verified rendered text/structure unchanged
+{ slug:"html-minify", name:"HTML Minifier Tool", description:"Remove comments and extra whitespace from HTML without changing how it renders.", category:"formatter", status:"live"},
 { slug:"html-validator", name:"HTML Validator Online", description:"Validate HTML markup and fix errors.", category:"formatter", status:"planned"},
 { slug:"html-viewer", name:"HTML Viewer Tool", description:"Render and preview HTML output.", category:"formatter", status:"planned"},
 
 /* ---------------- CSS TOOLS ---------------- */
 
 { slug:"css-formatter", name:"CSS Formatter & Beautifier", description:"Beautify CSS code for better readability.", category:"formatter", status:"planned"},
-// partial: only collapses whitespace; keeps comments
-{ slug:"css-minify", name:"CSS Minifier Tool", description:"Minify CSS to reduce file size.", category:"formatter", status:"partial"},
+// live: lib/tools/cssMinify.ts — unit-tested; browser-verified identical computed styles
+{ slug:"css-minify", name:"CSS Minifier Tool", description:"Remove comments and whitespace from CSS without changing what it does.", category:"formatter", status:"live"},
 { slug:"css-beautifier", name:"CSS Beautifier Online", description:"Format CSS code instantly.", category:"formatter", status:"planned"},
 
 /* ---------------- MARKDOWN / GRAPHQL ---------------- */
@@ -89,8 +89,8 @@ export const tools: Tool[] = [
 
 // placeholder: engine returns the input unchanged
 { slug:"xml-formatter", name:"XML Formatter & Beautifier", description:"Format XML data instantly.", category:"xml", status:"planned"},
-// partial: only collapses whitespace; keeps comments
-{ slug:"xml-minify", name:"XML Minifier Tool", description:"Minify XML data easily.", category:"xml", status:"partial"},
+// live: lib/tools/xmlMinify.ts — unit-tested; browser-verified same parsed document, same rejections
+{ slug:"xml-minify", name:"XML Minifier Tool", description:"Remove comments and indentation from XML and check it is well-formed.", category:"xml", status:"live"},
 { slug:"xml-parser", name:"XML Parser Tool", description:"Parse XML data into readable structure.", category:"xml", status:"planned"},
 { slug:"xml-validator", name:"XML Validator Online", description:"Validate XML syntax and structure.", category:"xml", status:"planned"},
 { slug:"xml-viewer", name:"XML Viewer Tool", description:"View XML data in structured format.", category:"xml", status:"planned"},
@@ -133,8 +133,8 @@ export const toolCategories: ToolCategory[] = [
   { id: "encoding", name: "Encoding Tools", description: "Base64 and URL percent-encoding, both directions." },
   { id: "developer", name: "Developer Utilities", description: "UUIDs, JWT decoding and Unix timestamps." },
   { id: "text", name: "Text Tools", description: "Sort lines and count words, characters and sentences." },
-  { id: "formatter", name: "Formatter Tools", description: "Beautify and inspect HTML source." },
-  { id: "xml", name: "XML Tools", description: "Format, validate and view XML." },
+  { id: "formatter", name: "Formatter Tools", description: "Minify HTML and CSS, and beautify or inspect HTML source." },
+  { id: "xml", name: "XML Tools", description: "Minify XML and check that it is well-formed." },
   { id: "yaml", name: "YAML Tools", description: "Format, validate and view YAML." },
 ]
 

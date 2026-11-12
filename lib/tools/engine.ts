@@ -1,4 +1,7 @@
 import { base64DecodeTool, base64EncodeTool } from "./base64"
+import { minifyCss } from "./cssMinify"
+import { minifyHtml } from "./htmlMinify"
+import { minifyXml } from "./xmlMinify"
 import { formatJson, minifyJson, validateJson } from "./json"
 import { decodeJwt } from "./jwt"
 import { countWords, sortLines } from "./text"
@@ -124,6 +127,90 @@ export const toolDefinitions: Record<string, ToolDefinition> = {
     outputLabel: "Converted",
     inputPlaceholder: "1700000000 or 2024-01-31T12:00:00Z",
     sample: "1700000000",
+  },
+
+  /* ---------------- MINIFIERS ---------------- */
+  "html-minify": {
+    primary: { label: "Minify", run: minifyHtml },
+    inputLabel: "HTML input",
+    outputLabel: "Minified HTML",
+    inputLanguage: "html",
+    outputLanguage: "html",
+    inputPlaceholder: "<!DOCTYPE html> …",
+    sample: [
+      "<!DOCTYPE html>",
+      "<html lang=\"en\">",
+      "  <head>",
+      "    <!-- Page metadata -->",
+      "    <title>  My   Page  </title>",
+      "    <style>",
+      "      body { margin : 0 ; font-family : system-ui, sans-serif ; }",
+      "    </style>",
+      "  </head>",
+      "  <body>",
+      "    <main>",
+      "      <h1>Hello,   world</h1>",
+      "      <p>",
+      "        Some <b>bold</b>   and <i>italic</i> text.",
+      "      </p>",
+      "      <pre>",
+      "  keep   this   spacing",
+      "      </pre>",
+      "    </main>",
+      "  </body>",
+      "</html>",
+    ].join("\n"),
+    accept: ".html,.htm,text/html,text/plain",
+  },
+  "css-minify": {
+    primary: { label: "Minify", run: minifyCss },
+    inputLabel: "CSS input",
+    outputLabel: "Minified CSS",
+    inputLanguage: "css",
+    outputLanguage: "css",
+    inputPlaceholder: ".card { color: red; }",
+    sample: [
+      "/*! Theme v1.0 | MIT License */",
+      "/* Card component */",
+      ".card ,",
+      ".panel > h2 {",
+      "  color : #333 ;",
+      "  margin : 0 auto ;",
+      "  padding: calc( 1rem + 2px ) ;",
+      "}",
+      "",
+      ".card::before {",
+      "  content : \"  → \" ;",
+      "}",
+      "",
+      "@media (min-width: 640px) {",
+      "  .card { padding : 2rem ; }",
+      "}",
+    ].join("\n"),
+    accept: ".css,text/css,text/plain",
+  },
+  "xml-minify": {
+    primary: { label: "Minify", run: minifyXml },
+    inputLabel: "XML input",
+    outputLabel: "Minified XML",
+    inputLanguage: "xml",
+    outputLanguage: "xml",
+    inputPlaceholder: "<?xml version=\"1.0\"?> …",
+    sample: [
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+      "<!-- Product catalog -->",
+      "<catalog>",
+      "  <book id=\"bk101\" lang=\"en\">",
+      "    <title>XML Developer's Guide</title>",
+      "    <price currency=\"USD\">44.95</price>",
+      "  </book>",
+      "  <book id=\"bk102\"   lang=\"hi\"   >",
+      "    <title>हिंदी पुस्तक</title>",
+      "    <price currency=\"INR\">499</price>",
+      "  </book>",
+      "</catalog>",
+    ].join("\n"),
+    accept: ".xml,.svg,.rss,.atom,application/xml,text/xml,text/plain",
   },
 
   /* ---------------- TEXT ---------------- */

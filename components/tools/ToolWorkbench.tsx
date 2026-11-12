@@ -45,7 +45,8 @@ export default function ToolWorkbench({ slug }: { slug: string }) {
     const result = action.run(input)
     if (result.ok) {
       setOutput(result.output)
-      setFeedback(null)
+      // Tools may report a short summary (e.g. bytes saved)
+      setFeedback(result.note ? { kind: "success", message: result.note } : null)
     } else {
       setOutput("")
       setFeedback({ kind: "error", message: result.error })

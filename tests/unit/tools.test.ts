@@ -41,15 +41,24 @@ test("liveToolLinks returns only working tools with real routes", () => {
   assert.equal(links.find((l) => l.slug === "view-source")?.href, "/tools/view-source")
   // Category pages are only linked when they contain a working generic tool
   assert.equal(categoryHref("json"), "/tools/category/json")
-  assert.equal(categoryHref("yaml"), null)
-  assert.equal(categoryHref("formatter"), null)
+  assert.equal(categoryHref("yaml"), null) // no working YAML tool yet
+  // Formatter and XML gained working generic tools (HTML/CSS/XML minifiers)
+  assert.equal(categoryHref("formatter"), "/tools/category/formatter")
+  assert.equal(categoryHref("xml"), "/tools/category/xml")
+  // The rule itself: a category page is linked iff it has a working generic tool
+  for (const id of new Set(tools.map((t) => t.category))) {
+    assert.equal(categoryHref(id) !== null, tools.some((t) => t.category === id && isLive(t)), id)
+  }
 })
 
-test("JSON-only actions appear only on JSON tools", () => {
+test("no tool runs JSON-only logic unless it is a JSON tool", () => {
   for (const [slug, def] of Object.entries(toolDefinitions)) {
-    const labels = [def.primary, ...(def.extra ?? [])].map((a) => a.label)
-    if (!slug.startsWith("json-")) {
-      assert.ok(!labels.includes("Validate") && !labels.includes("Minify"), `${slug} shows JSON actions`)
+    if (slug.startsWith("json-")) continue
+    // Every action, given this tool's own sample, must not behave like a JSON tool
+    for (const action of [def.primary, ...(def.extra ?? [])]) {
+      const r = action.run(def.sample)
+      assert.ok(r.ok || !/JSON/.test(r.error), `${slug} → ${action.label} gave a JSON error: ${!r.ok && r.error}`)
+      if (r.ok) assert.doesNotMatch(r.output, /Valid JSON/, `${slug} → ${action.label} produced JSON validation output`)
     }
   }
 })

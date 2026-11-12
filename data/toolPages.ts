@@ -76,6 +76,118 @@ export const toolPages: Record<string, ToolPageContent> = {
     ],
     related: ["json-validator", "json-minify", "json-viewer", "base64-encoder", "jwt-decoder", "url-encoder"],
   },
+
+  "html-minify": {
+    metaDescription:
+      "Minify HTML online: remove comments and extra whitespace without changing how the page renders. Keeps <pre>, <textarea> and scripts intact. Free, runs in your browser.",
+    intro:
+      "Shrink HTML by removing comments and unnecessary whitespace while keeping how the page renders. Code blocks, text areas and scripts are kept exactly as written.",
+    howTo: [
+      "Paste HTML, upload an .html file, or press Load example.",
+      "Press Minify (or Ctrl+Enter). The message above the editors shows how many bytes were saved.",
+      "Copy or download the minified HTML from the output panel.",
+    ],
+    formats: [
+      "Input: full HTML documents or fragments, including inline SVG.",
+      "Output: comments removed (except IE conditional comments), whitespace collapsed, spacing inside tags tidied, and CSS inside <style> minified.",
+      "Kept exactly: <pre>, <textarea> and <script> content, attribute values, entities and the case of tag names (important for SVG).",
+      "Files: .html or plain-text files up to 5 MB.",
+    ],
+    limitations: [
+      "Conservative by design: attribute quotes and optional closing tags are not removed, and JavaScript inside <script> is not minified.",
+      "Whitespace next to block-level elements (div, p, li, td, …) is removed because browsers don't render it there. If your CSS makes such elements inline or inline-block, for example menu items, the small gaps between them can disappear.",
+      "All comments are removed, including ones some frameworks use as markers (such as Knockout's <!-- ko -->).",
+      "If the CSS inside a <style> block is invalid, that block is kept unminified.",
+      "Only unclosed comments, tags and script/style/textarea elements are reported; the HTML structure is not validated.",
+    ],
+    faq: [
+      {
+        question: "Will minifying change how my page looks?",
+        answer:
+          "With default styles, no: only whitespace the browser would not display is removed, and a single space is kept between inline elements such as links and bold text. The one exception is described under limitations: block elements that your CSS turns into inline-block can lose the gap between them.",
+      },
+      {
+        question: "Is the JavaScript in my page minified too?",
+        answer:
+          "No. Script content is copied exactly, because minifying JavaScript safely requires a full JavaScript parser. Use a JavaScript minifier for scripts.",
+      },
+    ],
+    related: ["css-minify", "view-source", "xml-minify", "json-minify"],
+  },
+
+  "css-minify": {
+    metaDescription:
+      "Minify CSS online: remove comments and whitespace without changing what your styles do. Keeps strings, url() and /*! license */ comments. Free, runs in your browser.",
+    intro:
+      "Remove comments and unnecessary whitespace from CSS without changing what it does. Strings, url() values and license comments are kept exactly.",
+    howTo: [
+      "Paste CSS, upload a .css file, or press Load example.",
+      "Press Minify (or Ctrl+Enter) to get a single-line stylesheet and see the bytes saved.",
+      "If there is a syntax problem, such as a missing }, the error shows the line to fix.",
+      "Copy or download the minified CSS.",
+    ],
+    formats: [
+      "Input: standard CSS, including media queries, @font-face, @import, custom properties (variables) and native CSS nesting.",
+      "Output: the same rules without comments and redundant whitespace, with the last semicolon in each block removed.",
+      "Kept exactly: strings, url(…) values and /*! … */ license comments.",
+      "Files: .css or plain-text files up to 5 MB.",
+    ],
+    limitations: [
+      "Whitespace and comment removal only: rules are not merged, colours are not shortened (#ffffff stays #ffffff) and values are not rewritten, so build tools such as cssnano can produce smaller output.",
+      "Spaces before a colon in selectors are kept on purpose, because “a :hover” and “a:hover” mean different things.",
+      "Sass, SCSS and Less are not supported; convert them to CSS first.",
+      "Checks cover unbalanced braces and parentheses and unclosed strings or comments; property names and values are not validated.",
+    ],
+    faq: [
+      {
+        question: "Why are some comments kept?",
+        answer:
+          "Comments that start with /*! are a widely used convention for license and copyright notices that must stay in distributed files, so they are preserved. All other comments are removed.",
+      },
+      {
+        question: "Is minified CSS different in behaviour?",
+        answer:
+          "No. Only comments and whitespace that CSS ignores are removed. Strings, url() values and selector spacing that matters are left untouched, and the browser parses the result into the same rules.",
+      },
+    ],
+    related: ["html-minify", "view-source", "json-minify", "xml-minify"],
+  },
+
+  "xml-minify": {
+    metaDescription:
+      "Minify XML online and check it is well-formed: removes comments and indentation, keeps text values, attributes and CDATA exactly. Free, runs in your browser.",
+    intro:
+      "Remove comments and indentation from XML and check that it is well-formed. Text values, attributes and CDATA are kept exactly.",
+    howTo: [
+      "Paste XML, upload a file (.xml, .svg, .rss, .atom), or press Load example.",
+      "Press Minify (or Ctrl+Enter). If the XML is not well-formed, the error names the tag and line.",
+      "Copy or download the minified XML.",
+    ],
+    formats: [
+      "Input: XML 1.0 documents with one root element, including the XML declaration, DOCTYPE (with an internal subset), namespaces, CDATA, processing instructions and xml:space. Works for SVG, RSS, Atom and sitemaps.",
+      "Output: the same document without comments, whitespace-only text between elements, or extra spacing inside tags.",
+      "Files: XML or plain-text files up to 5 MB.",
+    ],
+    limitations: [
+      "Whitespace-only text between elements is removed. In mixed content such as <p><b>a</b> <i>b</i></p>, that space is meaningful; add xml:space=\"preserve\" to the element to keep it.",
+      "Text that contains other characters is never trimmed: <name>  Alice </name> keeps its spaces.",
+      "Well-formedness checks cover matching and nested tags, a single root element, duplicate attributes, and unescaped & and <. The XML is not validated against a schema or DTD.",
+      "Comments inside elements with xml:space=\"preserve\" are kept.",
+    ],
+    faq: [
+      {
+        question: "Does minifying change my data?",
+        answer:
+          "No. Element text with any non-space characters, attribute values, CDATA sections and entity references are copied exactly. Only comments and whitespace that sits alone between elements are removed.",
+      },
+      {
+        question: "Does it validate my XML against an XSD or DTD?",
+        answer:
+          "No. It checks well-formedness (the rules every XML document must follow), not validity against a schema.",
+      },
+    ],
+    related: ["html-minify", "css-minify", "json-minify", "json-formatter"],
+  },
 }
 
 export function getToolPage(slug: string): ToolPageContent | undefined {

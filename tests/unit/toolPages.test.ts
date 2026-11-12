@@ -3,7 +3,7 @@ import assert from "node:assert/strict"
 import { createElement as h } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import { toolPages } from "@/data/toolPages"
-import { tools, isLive } from "@/data/tools"
+import { tools, standaloneTools, isLive } from "@/data/tools"
 import { getToolDefinition } from "@/lib/tools/engine"
 import { formatJson, minifyJson } from "@/lib/tools/json"
 import Breadcrumb from "@/components/Breadcrumb"
@@ -22,7 +22,9 @@ test("every tool page entry belongs to a live tool with a definition", () => {
 
 test("related tools listed in content exist", () => {
   for (const [slug, page] of Object.entries(toolPages)) {
-    for (const r of page.related ?? []) assert.ok(tools.some((t) => t.slug === r), `${slug} → unknown related ${r}`)
+    for (const r of page.related ?? []) {
+      assert.ok([...tools, ...standaloneTools].some((t) => t.slug === r), `${slug} → unknown related ${r}`)
+    }
   }
 })
 
