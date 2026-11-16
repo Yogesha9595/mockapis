@@ -22,6 +22,8 @@ type PageMetadataInput = {
   path: string
   keywords?: string[]
   ogType?: "website" | "article"
+  /** Keep the page reachable but out of search results: robots "noindex, follow" */
+  noindex?: boolean
 }
 
 /**
@@ -35,11 +37,13 @@ export function pageMetadata({
   path,
   keywords,
   ogType = "website",
+  noindex = false,
 }: PageMetadataInput): Metadata {
   return {
     title,
     description,
     ...(keywords ? { keywords } : {}),
+    ...(noindex ? { robots: { index: false, follow: true } } : {}),
     alternates: { canonical: path },
     openGraph: {
       type: ogType,

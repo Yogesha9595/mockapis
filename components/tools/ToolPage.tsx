@@ -65,7 +65,7 @@ export default function ToolPage({ slug, name, category, content }: ToolPageProp
         description={content.intro}
         badges={<Badge variant="success">Runs in your browser</Badge>}
       >
-        <ToolWorkbench slug={slug} />
+        <ToolWorkbench slug={slug} trackUsage={content.trackUsage === true} />
 
         {/* ---------------- CONTENT BELOW THE TOOL ---------------- */}
         {/* grid-cols-1 = minmax(0,1fr): without it the implicit column grows to the widest example line on phones */}

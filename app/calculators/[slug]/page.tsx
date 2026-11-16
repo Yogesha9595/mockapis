@@ -24,6 +24,7 @@ export async function generateMetadata({
   if (!calc) {
     return {
       title: "Calculator Not Found",
+      robots: { index: false, follow: true },
     };
   }
 
@@ -31,6 +32,7 @@ export async function generateMetadata({
     title: `${calc.name} – Free Online Calculator`,
     description: `Use ${calc.name} instantly with charts & insights.`,
     path: `/calculators/${calc.slug}`,
+    noindex: true, // thin page: kept reachable, excluded from the sitemap and search results
   });
 }
 

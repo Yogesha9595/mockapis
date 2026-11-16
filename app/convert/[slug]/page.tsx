@@ -92,6 +92,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: "Unit Converter",
       description: "Free online unit converter",
+      robots: { index: false, follow: true },
     }
   }
 
@@ -101,6 +102,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `${from} to ${to} Converter – Free Online Tool`,
     description: `Convert ${from} to ${to} instantly using our free online unit converter.`,
     path: `/convert/${slug}`,
+    noindex: true, // thin page: kept reachable, excluded from the sitemap and search results
   })
 }
 

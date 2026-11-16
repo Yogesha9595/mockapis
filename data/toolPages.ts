@@ -27,6 +27,8 @@ export type ToolPageContent = {
   faq?: ToolFaq[]
   /** Related tool slugs to prefer (working tools only are shown) */
   related?: string[]
+  /** Send GA4 `tool_used` events (slug + action only, never input) — see lib/analytics.ts */
+  trackUsage?: boolean
 }
 
 export const toolPages: Record<string, ToolPageContent> = {
@@ -75,6 +77,7 @@ export const toolPages: Record<string, ToolPageContent> = {
       },
     ],
     related: ["json-validator", "json-minify", "json-viewer", "base64-encoder", "jwt-decoder", "url-encoder"],
+    trackUsage: true, // first tool reporting GA4 tool_used events
   },
 
   "html-minify": {

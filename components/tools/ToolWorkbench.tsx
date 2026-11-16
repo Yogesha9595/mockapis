@@ -8,6 +8,7 @@ import { ToolGrid, ToolPanel, ToolToolbar } from "@/components/tools/ToolLayout"
 import Button from "@/components/ui/Button"
 import Alert from "@/components/ui/Alert"
 import { getToolDefinition, type EditorLanguage, type ToolAction } from "@/lib/tools/engine"
+import { trackToolUsed } from "@/lib/analytics"
 
 const FILE_EXTENSION: Record<EditorLanguage, string> = {
   json: "json",
@@ -27,7 +28,7 @@ type Feedback = { kind: "error" | "success" | "info"; message: string } | null
  * The interactive part of a tool page: actions, input/output panels and
  * feedback. Behaviour comes from the tool's definition in lib/tools/engine.ts.
  */
-export default function ToolWorkbench({ slug }: { slug: string }) {
+export default function ToolWorkbench({ slug, trackUsage = false }: { slug: string; trackUsage?: boolean }) {
   const definition = getToolDefinition(slug)
   const inputId = useId()
   const outputId = useId()
@@ -41,7 +42,13 @@ export default function ToolWorkbench({ slug }: { slug: string }) {
 
   const actions = [definition.primary, ...(definition.extra ?? [])]
 
+  /* Analytics: tool slug + action name only — never the input or output */
+  const track = (action: string) => {
+    if (trackUsage) trackToolUsed(slug, action)
+  }
+
   const run = (action: ToolAction) => {
+    track(action.label)
     const result = action.run(input)
     if (result.ok) {
       setOutput(result.output)
@@ -66,6 +73,7 @@ export default function ToolWorkbench({ slug }: { slug: string }) {
   }
 
   const copyOutput = async () => {
+    track("copy")
     try {
       await navigator.clipboard.writeText(output)
       setFeedback({ kind: "success", message: "Output copied to clipboard." })
@@ -75,6 +83,7 @@ export default function ToolWorkbench({ slug }: { slug: string }) {
   }
 
   const downloadOutput = () => {
+    track("download")
     const url = URL.createObjectURL(new Blob([output], { type: "text/plain;charset=utf-8" }))
     const a = document.createElement("a")
     a.href = url

@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `${category} Converter – Free Online Tool`,
     description: `Convert ${category} units instantly using our free online converter.`,
     path: `/converters/${category}`,
+    noindex: true, // thin page: kept reachable, excluded from the sitemap and search results
   })
 }
 

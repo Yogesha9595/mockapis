@@ -1,10 +1,18 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Inter } from "next/font/google";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from "@/lib/site";
+import { googleTagsBootstrapScript, gaConfigScript, gaMeasurementId } from "@/lib/analytics";
+
+/* AdSense publisher (site-wide loader only; no ad units are placed) */
+const ADSENSE_CLIENT = "ca-pub-1954376162691867";
+
+/* GA4 ID from NEXT_PUBLIC_GA_ID; null unless set, valid, and a production build */
+const GA_ID = gaMeasurementId();
 
 const inter = Inter({
   subsets: ["latin"],
@@ -99,6 +107,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* GOOGLE ADSENSE account verification (with public/ads.txt) */}
+        <meta name="google-adsense-account" content={ADSENSE_CLIENT} />
+
+        {/* CONSENT MODE DEFAULTS, then the AdSense loader — in that order, guaranteed.
+            Denied in the EEA, UK and Switzerland; granted elsewhere. No ad units are placed.
+            (A plain async <script> would be hoisted above this by React; see lib/analytics.ts.) */}
+        <script id="google-tags-bootstrap" dangerouslySetInnerHTML={{ __html: googleTagsBootstrapScript(ADSENSE_CLIENT) }} />
+
         {/* THEME INIT (runs before paint, no flicker). Light is the default;
             dark applies only when the visitor chose it with the toggle.
             Keep in sync with components/ThemeToggle.tsx. */}
@@ -122,6 +138,16 @@ export default function RootLayout({
 
         {/* FOOTER */}
         <Footer />
+
+        {/* GOOGLE ANALYTICS 4 (production builds with NEXT_PUBLIC_GA_ID only) */}
+        {GA_ID && (
+          <>
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
+            <Script id="ga4-config" strategy="afterInteractive">
+              {gaConfigScript(GA_ID)}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );
