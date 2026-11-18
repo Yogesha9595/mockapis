@@ -6,6 +6,8 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Documentation for DevUtilities Lab mock APIs, API playground, endpoints, and HTTP status codes.",
   path: "/docs",
+  noindex: true, // documents mock API routes that are not deployed
+  nofollow: true,
 })
 
 import Link from "next/link"

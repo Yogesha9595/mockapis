@@ -13,14 +13,6 @@ export const metadata: Metadata = pageMetadata({
     "Explore free online calculators for finance, health, math, and more. Fast, accurate, and easy-to-use tools like BMI, EMI, age, and percentage calculators.",
   path: "/calculators",
   noindex: true, // thin page (most calculators are "coming soon"): reachable, not indexed
-  keywords: [
-    "free calculators",
-    "online calculator",
-    "BMI calculator",
-    "EMI calculator",
-    "loan calculator",
-    "percentage calculator",
-  ],
 });
 
 // ✅ Types (future-proof)

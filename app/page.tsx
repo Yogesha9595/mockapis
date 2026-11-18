@@ -9,17 +9,13 @@ import { Card } from "@/components/ui/Card"
 import Badge from "@/components/ui/Badge"
 import { liveToolLinks, toolCategories, categoryHref, type ToolLink } from "@/data/tools"
 import { getAllArticles } from "@/lib/blog/getAllArticles"
-import { SITE_NAME, absoluteUrl, pageMetadata } from "@/lib/site"
+import { SITE_NAME, HOME_TITLE, SITE_DESCRIPTION, absoluteUrl, pageMetadata } from "@/lib/site"
 
-/* ---------------- METADATA (same title/description as before, plus canonical) ---------------- */
-
-const TITLE = `${SITE_NAME} – Free Developer Tools & Utilities`
-const DESCRIPTION =
-  "Free developer tools including mock APIs, JSON formatter, converters, compilers, and API playground to build faster."
+/* ---------------- METADATA (title and description are defined once, in lib/site.ts) ---------------- */
 
 export const metadata: Metadata = {
-  ...pageMetadata({ title: TITLE, description: DESCRIPTION, path: "/" }),
-  title: { absolute: TITLE }, // don't append the "| DevUtilities Lab" template to the homepage
+  ...pageMetadata({ title: HOME_TITLE, description: SITE_DESCRIPTION, path: "/" }),
+  title: { absolute: HOME_TITLE }, // don't append the "| DevUtilities Lab" template to the homepage
 }
 
 /* ---------------- CONTENT CHOICES ---------------- */

@@ -5,7 +5,7 @@ import { Inter } from "next/font/google";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from "@/lib/site";
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE, HOME_TITLE, SITE_DESCRIPTION } from "@/lib/site";
 import { googleTagsBootstrapScript, gaConfigScript, gaMeasurementId } from "@/lib/analytics";
 
 /* AdSense publisher (site-wide loader only; no ad units are placed) */
@@ -25,24 +25,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: `${SITE_NAME} – Free Developer Tools & Utilities`,
+    default: HOME_TITLE,
     template: `%s | ${SITE_NAME}`,
   },
 
-  description:
-    "Free developer tools including mock APIs, JSON formatter, converters, compilers, and API playground to build faster.",
-
-  keywords: [
-    "developer tools",
-    "mock api",
-    "json formatter",
-    "api testing",
-    "online compiler",
-    "unit converter",
-    "free dev tools",
-    "api playground",
-    "json validator",
-  ],
+  description: SITE_DESCRIPTION,
 
   authors: [{ name: `${SITE_NAME} Team` }],
   creator: SITE_NAME,
@@ -56,17 +43,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
-    title: `${SITE_NAME} – Free Developer Tools & Utilities`,
-    description:
-      "All-in-one platform for developers: mock APIs, JSON tools, compilers, converters, and more.",
+    title: HOME_TITLE,
+    description: SITE_DESCRIPTION,
     images: [{ url: DEFAULT_OG_IMAGE, alt: SITE_NAME }],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} – Free Developer Tools`,
-    description:
-      "Free developer tools including mock APIs, JSON tools, compilers, and converters.",
+    title: HOME_TITLE,
+    description: SITE_DESCRIPTION,
     images: [DEFAULT_OG_IMAGE],
   },
 

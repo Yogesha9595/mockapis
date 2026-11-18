@@ -20,7 +20,6 @@ type Params = {
 type ArticleFrontmatter = {
   title?: string
   description?: string
-  keywords?: string[]
   category?: string
   readingTime?: string
   date?: string
@@ -60,7 +59,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       title: frontmatter.title ?? slug.replace(/-/g, " "),
       description: frontmatter.description ?? "",
       path: `/learn/${slug}`,
-      keywords: Array.isArray(frontmatter.keywords) ? frontmatter.keywords : undefined,
       ogType: "article",
     })
   } catch (error) {

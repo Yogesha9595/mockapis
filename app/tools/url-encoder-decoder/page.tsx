@@ -14,14 +14,8 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Free URL encoder and decoder tool. Encode URLs, decode query strings, and convert special characters instantly online.",
   path: PATH,
-  keywords: [
-    "url encoder",
-    "url decoder",
-    "encode url online",
-    "decode url online",
-    "url encode javascript",
-    "url decode tool",
-  ],
+  noindex: true, // status "partial" in data/tools.ts: remove when it goes live
+  nofollow: true,
 })
 
 /* ✅ Wrapper (safe for client hooks) */

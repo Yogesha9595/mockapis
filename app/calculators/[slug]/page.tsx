@@ -113,11 +113,6 @@ export default async function CalculatorPage({
         {/* ================= RIGHT SIDEBAR ================= */}
         <aside className="hidden lg:block sticky top-24 h-fit space-y-6">
 
-          {/* 🔥 ADS SLOT */}
-          <div className="bg-gray-100 dark:bg-gray-800 border rounded-xl h-64 flex items-center justify-center text-sm text-gray-400">
-            Ad Space
-          </div>
-
           {/* 🔥 INTERNAL SEO LINKS */}
           <div className="bg-white dark:bg-gray-900 border rounded-xl p-4">
             <h3 className="font-semibold mb-3 text-sm">

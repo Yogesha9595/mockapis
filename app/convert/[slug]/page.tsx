@@ -237,10 +237,6 @@ export default async function ConvertPage({ params, searchParams }: PageProps) {
         </div>
       </div>
 
-      <div className="mt-12 text-center text-gray-400">
-        Ad Space
-      </div>
-
     </div>
   )
 }

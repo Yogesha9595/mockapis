@@ -13,14 +13,6 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Learn APIs, HTTP requests, backend concepts, and real-world development with in-depth guides and tutorials.",
   path: "/learn",
-  keywords: [
-    "API tutorials",
-    "learn APIs",
-    "REST API guide",
-    "backend development",
-    "HTTP codes",
-    "developer learning",
-  ],
 })
 
 /* ---------------- PAGE ---------------- */

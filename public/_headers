@@ -12,3 +12,13 @@
 
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Keep the *.pages.dev addresses out of search results (production alias and
+# preview/branch subdomains). Pattern from Cloudflare's _headers docs
+# (developers.cloudflare.com/pages/configuration/headers/, checked 2026-11-18).
+# Absolute-URL rules match on host, so the custom domain devutilitieslab.com is not affected.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex

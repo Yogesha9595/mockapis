@@ -115,11 +115,6 @@ export default async function ConverterCategoryPage({ params }: PageProps) {
 
       </div>
 
-      {/* 💰 Monetization */}
-      <div className="mt-12 text-center text-gray-400">
-        Ad Space
-      </div>
-
     </div>
   )
 }

@@ -10,13 +10,8 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Check Schema.org JSON-LD structured data for syntax errors and missing required properties. Paste JSON-LD or page HTML; runs in your browser.",
   path: PATH,
-  keywords: [
-    "schema validator",
-    "json ld validator",
-    "structured data testing tool",
-    "schema markup checker",
-    "rich results test alternative",
-  ],
+  noindex: true, // status "partial" in data/tools.ts: remove when it goes live
+  nofollow: true,
 })
 
 export default function Page() {

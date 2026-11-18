@@ -6,6 +6,8 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Browse the mock REST API endpoints available on DevUtilities Lab for testing and learning API development.",
   path: "/apis",
+  noindex: true, // mock API routes are not deployed
+  nofollow: true,
 })
 
 import EndpointCard from "@/components/EndpointCard"

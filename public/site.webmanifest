@@ -1,7 +1,7 @@
 {
   "name": "DevUtilities Lab",
   "short_name": "DevUtils",
-  "description": "Free developer tools including mock APIs, JSON tools, compilers, and converters.",
+  "description": "Free developer tools that run in your browser: JSON, Base64, URL, JWT, UUID, timestamp, text and minifier tools.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

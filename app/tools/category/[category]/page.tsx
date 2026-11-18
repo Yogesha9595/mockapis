@@ -14,8 +14,14 @@ type PageProps = {
   params: Promise<{ category: string }>
 }
 
+/* Acronyms are written in capitals ("JSON Tools", not "Json Tools") */
+const ACRONYMS = new Set(["json", "xml", "yaml"])
+
 function categoryTitle(category: string) {
-  return category.charAt(0).toUpperCase() + category.slice(1) + " Tools"
+  const label = ACRONYMS.has(category)
+    ? category.toUpperCase()
+    : category.charAt(0).toUpperCase() + category.slice(1)
+  return label + " Tools"
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

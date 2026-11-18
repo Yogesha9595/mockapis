@@ -6,6 +6,8 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Learn how to list, create, update, and delete users with the DevUtilities Lab mock Users API.",
   path: "/docs/users",
+  noindex: true, // documents mock API routes that are not deployed
+  nofollow: true,
 })
 
 import EndpointCard from "@/components/EndpointCard"

@@ -86,15 +86,8 @@ export default function ClientFilter({
       {/* 📚 ARTICLES GRID */}
       <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-        {filteredArticles.map((article, index) => (
-          <div key={article.slug} className="contents">
-
-            <ArticleCard article={article} />
-
-            {/* 🧾 AD SLOT */}
-            {(index + 1) % 6 === 0 && <AdBlock key={`ad-${index}`} />}
-
-          </div>
+        {filteredArticles.map((article) => (
+          <ArticleCard key={article.slug} article={article} />
         ))}
 
       </div>
@@ -145,25 +138,5 @@ function ArticleCard({ article }: { article: Article }) {
         {article.readingTime && <span>{article.readingTime}</span>}
       </div>
     </Link>
-  )
-}
-
-/* ---------------- AD BLOCK ---------------- */
-
-function AdBlock() {
-  return (
-    <div className="sm:col-span-1 md:col-span-2 lg:col-span-3">
-      <div className="border rounded-xl p-6 bg-gray-50 dark:bg-zinc-900 dark:border-zinc-800 text-center">
-
-        <p className="text-[10px] uppercase text-gray-400 mb-2 tracking-wider">
-          Sponsored
-        </p>
-
-        <div className="h-28 flex items-center justify-center text-gray-500 text-sm">
-          Ad Space (Responsive Banner)
-        </div>
-
-      </div>
-    </div>
   )
 }

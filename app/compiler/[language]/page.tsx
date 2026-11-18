@@ -56,23 +56,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    // Code execution is not deployed yet, so these pages stay out of search results
-    robots: { index: false, follow: true },
     ...pageMetadata({
     title: `${data.name} Online Compiler (Free) – Run ${data.name} Code Online Instantly`,
     description: `Run ${data.name} code online instantly with our free ${data.name} compiler. No installation required. Supports input, fast execution, and real-time output.`,
     path: `/compiler/${language}`,
-    keywords: [
-      `${data.name} online compiler`,
-      `run ${data.name} code online`,
-      `${data.name} compiler free`,
-      `${data.name} online IDE`,
-      `${data.name} code runner`,
-      `execute ${data.name} programs online`,
-      `${data.name} compiler without installation`,
-      `${data.name} coding platform`,
-      `${data.name} code editor online`
-    ]
+    // Code execution is not deployed yet, so these pages stay out of search results
+    noindex: true,
+    nofollow: true,
     }),
   }
 }

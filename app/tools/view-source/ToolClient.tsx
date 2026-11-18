@@ -242,13 +242,6 @@ export default function ToolClient() {
               </button>
             </div>
           </div>
-
-          {/* 💰 AD BLOCK */}
-          <div className="max-w-5xl mx-auto">
-            <div className="bg-gray-100 border rounded-lg text-center py-6 text-sm text-gray-500">
-              Ad Banner (728x90)
-            </div>
-          </div>
         </>
       )}
     </div>

@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
 import ThemeToggle from "./ThemeToggle";
-import SupportButton from "./SupportButton";
 import ToolsMenu from "./nav/ToolsMenu";
 import SearchDialog from "./nav/SearchDialog";
 import { navCategories, PRIMARY_LINKS } from "./nav/navData";
@@ -90,9 +89,6 @@ export default function Header() {
           <div className="flex shrink-0 items-center gap-2">
             <SearchDialog tools={SEARCHABLE_TOOLS} />
             <ThemeToggle />
-            <div className="hidden xl:block">
-              <SupportButton />
-            </div>
             <button
               type="button"
               onClick={() => setMenuOpen((open) => !open)}

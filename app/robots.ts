@@ -3,26 +3,29 @@ import { SITE_URL } from "@/lib/site"
 
 export const dynamic = "force-static"
 
+/** Cloudflare Pages builds this branch as the production deployment (devutilitieslab.com). */
+const PRODUCTION_BRANCH = "main"
+
 /**
- * Crawling is allowed only for production builds.
- * - On Vercel, VERCEL_ENV distinguishes "production" from "preview"/"development",
- *   so preview deployments are never indexed.
- * - Elsewhere (local `next build`, other hosts), fall back to NODE_ENV.
+ * Crawling is allowed only in the production deployment.
+ *
+ * robots.txt is a static file built per deployment, so the decision uses the
+ * build environment Cloudflare Pages provides (CF_PAGES, CF_PAGES_BRANCH):
+ *  - production build (branch "main" on Cloudflare Pages) → allow
+ *  - preview deployments (any other branch)               → block everything
+ *  - any build outside Cloudflare Pages (local, CI)       → block everything
  */
-function isProductionBuild(): boolean {
-  if (process.env.VERCEL_ENV) return process.env.VERCEL_ENV === "production"
-  return process.env.NODE_ENV === "production"
+function isProductionDeployment(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.CF_PAGES === "1" && env.CF_PAGES_BRANCH === PRODUCTION_BRANCH
 }
 
 export default function robots(): MetadataRoute.Robots {
-  const allowCrawling = isProductionBuild()
+  if (!isProductionDeployment()) {
+    return { rules: [{ userAgent: "*", disallow: "/" }] }
+  }
 
   return {
-    rules: [
-      allowCrawling
-        ? { userAgent: "*", allow: "/" }
-        : { userAgent: "*", disallow: "/" },
-    ],
+    rules: [{ userAgent: "*", allow: "/" }],
     sitemap: `${SITE_URL}/sitemap.xml`,
   }
 }

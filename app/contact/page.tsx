@@ -13,12 +13,12 @@ export default function ContactPage() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 space-y-16">
 
       {/* HERO */}
-     <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
-  <span className="text-white">Contact </span>
-  <span className="bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
+     <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
+  <span>Contact </span>
+  <span className="text-primary">
     DevUtilities Lab
   </span>
-  <span className="text-white"> 📬</span>
+  <span> 📬</span>
 </h1>
       {/* EMAIL PRIMARY CARD */}
       <div className="relative group">

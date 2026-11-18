@@ -255,18 +255,6 @@ export default function OnlineCompilerPage() {
 
       </div>
 
-      {/* 🔥 ADS SIDEBAR */}
-      <div className="hidden lg:block w-[300px]">
-        <div className="sticky top-20 space-y-6">
-          <div className="h-[250px] bg-zinc-200 flex items-center justify-center rounded">
-            Ads 300x250
-          </div>
-          <div className="h-[600px] bg-zinc-200 flex items-center justify-center rounded">
-            Ads 300x600
-          </div>
-        </div>
-      </div>
-
     </div>
   )
 }
