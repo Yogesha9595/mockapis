@@ -98,7 +98,7 @@ export default function ToolsMenu({ categories, active }: { categories: NavCateg
         </div>
         <div className="mt-4 border-t border-border pt-3">
           <Link href="/tools" onClick={() => setOpen(false)} className="text-sm font-medium text-primary hover:underline">
-            All tools, including coming soon →
+            All tools →
           </Link>
         </div>
       </div>

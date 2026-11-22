@@ -27,23 +27,17 @@ function categoryTitle(category: string) {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { category } = await params
 
-  // A category with no working tools is a list of placeholders: keep it out of search
-  const hasLiveTool = tools.some((t) => t.category === category && isLive(t))
-
-  return {
-    ...pageMetadata({
-      title: categoryTitle(category),
-      description: `Explore free online ${category} tools for developers. Format, convert, encode, validate, and transform your data instantly.`,
-      path: `/tools/category/${category}`,
-    }),
-    ...(hasLiveTool ? {} : { robots: { index: false, follow: true } }),
-  }
+  return pageMetadata({
+    title: categoryTitle(category),
+    description: `Explore free online ${category} tools for developers. Format, convert, encode, validate, and transform your data instantly.`,
+    path: `/tools/category/${category}`,
+  })
 }
 
-// ✅ GENERATE STATIC PARAMS
+// ✅ GENERATE STATIC PARAMS: only categories with at least one working tool get a page
 export async function generateStaticParams() {
   const categories = Array.from(
-    new Set(tools.map((tool) => tool.category))
+    new Set(tools.filter(isLive).map((tool) => tool.category))
   )
 
   return categories.map((category) => ({
@@ -57,7 +51,7 @@ export default async function CategoryPage({ params }: PageProps) {
   const { category } = await params
 
   const categoryTools = tools.filter(
-    (tool) => tool.category === category
+    (tool) => tool.category === category && isLive(tool)
   )
 
   if (categoryTools.length === 0) notFound()
@@ -82,49 +76,25 @@ export default async function CategoryPage({ params }: PageProps) {
       {/* Tools Grid */}
       <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-        {categoryTools.map((tool) =>
-          isLive(tool) ? (
+        {categoryTools.map((tool) => (
 
-            <Link
-              key={tool.slug}
-              href={`/tools/${tool.slug}`}
-              className="border rounded-lg p-5 hover:shadow transition bg-white"
-            >
+          <Link
+            key={tool.slug}
+            href={`/tools/${tool.slug}`}
+            className="border rounded-lg p-5 hover:shadow transition bg-white"
+          >
 
-              <h2 className="font-semibold mb-2">
-                {tool.name}
-              </h2>
+            <h2 className="font-semibold mb-2">
+              {tool.name}
+            </h2>
 
-              <p className="text-sm text-gray-500">
-                {tool.description}
-              </p>
+            <p className="text-sm text-gray-500">
+              {tool.description}
+            </p>
 
-            </Link>
+          </Link>
 
-          ) : (
-
-            /* Unfinished tool: visible but not linked, same as the /tools hub */
-            <div
-              key={tool.slug}
-              className="border rounded-lg p-5 bg-white opacity-60 cursor-not-allowed"
-            >
-
-              <h2 className="font-semibold mb-2">
-                {tool.name}
-              </h2>
-
-              <p className="text-sm text-gray-500">
-                {tool.description}
-              </p>
-
-              <div className="mt-3 text-xs text-gray-400">
-                Coming soon
-              </div>
-
-            </div>
-
-          )
-        )}
+        ))}
 
       </div>
 

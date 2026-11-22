@@ -77,7 +77,7 @@ export default function ToolSearch({ tools, autoFocus = false }: { tools: ToolLi
               <p className="px-4 py-3 text-sm text-muted">
                 No working tool matches &ldquo;{query.trim()}&rdquo;.{" "}
                 <Link href="/tools" className="font-medium text-primary underline-offset-2 hover:underline">
-                  See all tools, including ones that are coming soon
+                  See all tools
                 </Link>
                 .
               </p>

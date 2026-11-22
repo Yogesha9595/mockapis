@@ -4,8 +4,8 @@
  * status (audited against lib/tools/engine.ts with real inputs):
  *  - "live"    → does what its name says for typical input. Indexable, linked from the hub.
  *  - "partial" → runs, but produces wrong/incomplete output for common input.
- *                Route kept, `noindex`, shown as "Coming soon" in listings.
- *  - "planned" → placeholder output only. Route kept, `noindex`, "Coming soon".
+ *  - "planned" → not built yet.
+ * Only "live" tools get a /tools/<slug> page (others 404) and appear in any listing.
  */
 export type ToolStatus = "live" | "partial" | "planned"
 
@@ -31,8 +31,6 @@ export const tools: Tool[] = [
 { slug:"json-formatter", name:"JSON Formatter & Beautifier", description:"Format, validate and beautify JSON data instantly online.", category:"json", status:"live"},
 { slug:"json-validator", name:"JSON Validator Online", description:"Validate JSON structure and detect errors instantly.", category:"json", status:"live"},
 { slug:"json-minify", name:"JSON Minifier", description:"Minify JSON data to reduce file size.", category:"json", status:"live"},
-{ slug:"json-viewer", name:"JSON Viewer Tool", description:"View and explore JSON data in a readable format.", category:"json", status:"live"},
-{ slug:"json-pretty", name:"JSON Pretty Print Tool", description:"Pretty print JSON for better readability.", category:"json", status:"live"},
 // placeholder: "coming soon"
 { slug:"json-compare", name:"JSON Compare Tool", description:"Compare two JSON objects and find differences.", category:"json", status:"planned"},
 // placeholder: engine returns "Conversion ... initiated (Library required)"
@@ -111,15 +109,15 @@ export const tools: Tool[] = [
 
 /**
  * Hand-built tools with their own routes (app/tools/<slug>/).
- * Listed on the /tools hub only; not part of /tools/[slug] static params.
+ * Listed on the /tools hub when live; not part of /tools/[slug] static params.
  */
 export const standaloneTools: StandaloneTool[] = [
   // live: paste-HTML beautify, sandboxed preview, DOM tree and SEO insights, all client-side.
   // (Fetching a page by URL is not offered: it needs a server.)
   { slug:"view-source", href:"/tools/view-source", name:"View Source & HTML Beautifier", description:"Beautify pasted HTML and inspect its structure and SEO tags.", category:"formatter", status:"live"},
-  // partial: rewritten client-side (lib/tools/url.ts, unit-tested); stays partial until browser-tested
-  { slug:"url-encoder-decoder", href:"/tools/url-encoder-decoder", name:"URL Encoder & Decoder", description:"Encode or decode URLs and query strings.", category:"encoding", status:"partial"},
-  // partial: rewritten client-side (lib/tools/schemaValidator.ts, unit-tested); stays partial until browser-tested
+  // partial: validation logic browser-tested OK (2026-11-22, Product/FAQPage/Article, valid and broken),
+  // but the page fails the UI checks: unreadable H1 in dark theme, tool card clipped at phone width.
+  // The route stays noindex and unlinked until those are fixed.
   { slug:"schema-validator", href:"/tools/schema-validator", name:"Schema Markup Validator", description:"Validate JSON-LD structured data.", category:"developer", status:"partial"},
 ]
 

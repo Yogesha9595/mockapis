@@ -7,7 +7,7 @@ import ToolWorkbench from "@/components/tools/ToolWorkbench"
 import { Card } from "@/components/ui/Card"
 import Badge from "@/components/ui/Badge"
 import { liveToolLinks, toolCategories, categoryHref, type ToolLink } from "@/data/tools"
-import type { ToolPageContent } from "@/data/toolPages"
+import type { ToolError, ToolExample, ToolPageContent } from "@/data/toolPages"
 import { getToolDefinition } from "@/lib/tools/engine"
 import { absoluteUrl, SITE_NAME } from "@/lib/site"
 
@@ -18,27 +18,23 @@ import { absoluteUrl, SITE_NAME } from "@/lib/site"
 
 type ToolPageProps = {
   slug: string
-  name: string
   category: string
   content: ToolPageContent
 }
 
 const sectionTitle = "text-lg font-semibold tracking-tight text-foreground sm:text-xl"
 
-export default function ToolPage({ slug, name, category, content }: ToolPageProps) {
+export default function ToolPage({ slug, category, content }: ToolPageProps) {
   const categoryInfo = toolCategories.find((c) => c.id === category)
   const catHref = categoryHref(category)
   const definition = getToolDefinition(slug)
 
-  // Sample output is computed by the real tool at build time, so it is always accurate
-  const example = definition && definition.primary.run(definition.sample)
-
   const appJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name,
+    name: content.h1,
     url: absoluteUrl(`/tools/${slug}`),
-    description: content.metaDescription ?? content.intro,
+    description: content.metaDescription,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Any (runs in the browser)",
     isAccessibleForFree: true,
@@ -55,13 +51,13 @@ export default function ToolPage({ slug, name, category, content }: ToolPageProp
             { label: "Home", href: "/" },
             { label: "Tools", href: "/tools" },
             ...(categoryInfo ? [{ label: categoryInfo.name, href: catHref ?? undefined }] : []),
-            { label: name },
+            { label: content.h1 },
           ]}
         />
       </div>
 
       <ToolLayout
-        title={name}
+        title={content.h1}
         description={content.intro}
         badges={<Badge variant="success">Runs in your browser</Badge>}
       >
@@ -72,17 +68,12 @@ export default function ToolPage({ slug, name, category, content }: ToolPageProp
         <div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="min-w-0 space-y-12">
             <HowToUse steps={content.howTo} />
-            <FormatsAndLimits formats={content.formats} limitations={content.limitations} />
-            {definition && example?.ok && (
-              <ExampleBlock
-                inputLabel={definition.inputLabel}
-                outputLabel={definition.outputLabel}
-                input={definition.sample}
-                output={example.output}
-                action={definition.primary.label}
-              />
+            {definition && (
+              <Examples examples={content.examples} inputLabel={definition.inputLabel} outputLabel={definition.outputLabel} />
             )}
-            {content.faq && content.faq.length > 0 && <Faq items={content.faq} />}
+            <CommonErrors errors={content.errors} />
+            <FormatsAndLimits formats={content.formats} limitations={content.limitations} />
+            <Faq items={content.faq} />
           </div>
 
           <aside aria-labelledby="related-title" className="lg:sticky lg:top-24 lg:self-start">
@@ -146,34 +137,59 @@ function FormatsAndLimits({ formats, limitations }: { formats: string[]; limitat
   )
 }
 
-function ExampleBlock({
+function Examples({
+  examples,
   inputLabel,
   outputLabel,
-  input,
-  output,
-  action,
 }: {
+  examples: ToolExample[]
   inputLabel: string
   outputLabel: string
-  input: string
-  output: string
-  action: string
 }) {
   const pre = "max-h-72 overflow-auto rounded-control border border-border bg-surface p-3 font-mono text-xs leading-relaxed text-foreground sm:text-sm"
   return (
-    <section aria-labelledby="example-title">
-      <h2 id="example-title" className={sectionTitle}>Example</h2>
-      <p className="mt-1 text-sm text-muted">This is the built-in example and the tool&apos;s real result for {action}.</p>
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <figure className="min-w-0">
-          <figcaption className="mb-1.5 text-sm font-medium text-foreground">{inputLabel}</figcaption>
-          <pre className={pre} tabIndex={0}><code>{input}</code></pre>
-        </figure>
-        <figure className="min-w-0">
-          <figcaption className="mb-1.5 text-sm font-medium text-foreground">{outputLabel}</figcaption>
-          <pre className={pre} tabIndex={0}><code>{output}</code></pre>
-        </figure>
+    <section aria-labelledby="examples-title">
+      <h2 id="examples-title" className={sectionTitle}>Worked examples</h2>
+      <div className="mt-4 space-y-8">
+        {examples.map((ex) => (
+          <article key={ex.title} className="min-w-0">
+            <h3 className="font-semibold text-foreground">{ex.title}</h3>
+            <p className="mt-1 text-sm leading-relaxed text-muted">{ex.note}</p>
+            <div className="mt-3 grid gap-4 md:grid-cols-2">
+              <figure className="min-w-0">
+                <figcaption className="mb-1.5 text-sm font-medium text-foreground">
+                  {inputLabel}
+                  {ex.action && <span className="font-normal text-muted"> · {ex.action}</span>}
+                </figcaption>
+                <pre className={pre} tabIndex={0}><code>{ex.input}</code></pre>
+              </figure>
+              <figure className="min-w-0">
+                <figcaption className="mb-1.5 text-sm font-medium text-foreground">{ex.error ? "Error message" : outputLabel}</figcaption>
+                <pre className={pre} tabIndex={0}><code>{ex.output}</code></pre>
+              </figure>
+            </div>
+          </article>
+        ))}
       </div>
+    </section>
+  )
+}
+
+function CommonErrors({ errors }: { errors: ToolError[] }) {
+  return (
+    <section aria-labelledby="errors-title">
+      <h2 id="errors-title" className={sectionTitle}>Common errors</h2>
+      <dl className="mt-4 space-y-5">
+        {errors.map((e) => (
+          <div key={e.message} className="min-w-0">
+            <dt className="break-words font-mono text-sm text-foreground">{e.message}</dt>
+            <dd className="mt-1.5 space-y-1 text-sm leading-relaxed text-muted">
+              <p>{e.cause}</p>
+              <p>{e.fix}</p>
+            </dd>
+          </div>
+        ))}
+      </dl>
     </section>
   )
 }

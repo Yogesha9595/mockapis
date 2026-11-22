@@ -1,3 +1,19 @@
-# Cloudflare Pages redirects (static hosting ignores next.config redirects).
-# Mirrors redirects() in next.config.ts.
+# Cloudflare Pages redirects. Production uses only this file
+# (next.config.ts redirects() applies only to non-export builds).
 /home / 301
+
+# Removed features (2026-11-18). These URLs were in the sitemap from 2026-11-12 to 2026-11-16,
+# so they may have been crawled; send them to the closest live page.
+/calculators /tools 301
+/calculators/* /tools 301
+/converters/* /tools 301
+/convert/* /tools 301
+
+# Duplicate tool pages merged (2026-11-22). json-viewer and json-pretty were in the sitemap;
+# url-encoder-decoder was indexable until 2026-11-18. Its Full URL and Form modes now live on /tools/url-encoder.
+/tools/json-pretty /tools/json-formatter 301
+/tools/json-pretty/ /tools/json-formatter 301
+/tools/json-viewer /tools/json-formatter 301
+/tools/json-viewer/ /tools/json-formatter 301
+/tools/url-encoder-decoder /tools/url-encoder 301
+/tools/url-encoder-decoder/ /tools/url-encoder 301

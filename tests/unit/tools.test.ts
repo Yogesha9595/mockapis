@@ -37,7 +37,7 @@ test("liveToolLinks returns only working tools with real routes", () => {
     assert.match(link.href, /^\/tools\/[a-z0-9-]+$/)
   }
   // Partial/planned tools never appear, standalone hrefs are used as-is
-  assert.ok(!links.some((l) => l.slug === "json-to-csv" || l.slug === "url-encoder-decoder"))
+  assert.ok(!links.some((l) => l.slug === "json-to-csv" || l.slug === "schema-validator"))
   assert.equal(links.find((l) => l.slug === "view-source")?.href, "/tools/view-source")
   // Category pages are only linked when they contain a working generic tool
   assert.equal(categoryHref("json"), "/tools/category/json")

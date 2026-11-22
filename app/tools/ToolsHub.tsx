@@ -5,12 +5,10 @@ import Link from "next/link"
 import { tools, standaloneTools, isLive, type Tool, type StandaloneTool } from "@/data/tools"
 import { motion } from "framer-motion"
 
-/* Hand-built tools first, then the generic /tools/[slug] tools */
-const allTools: (Tool | StandaloneTool)[] = [...standaloneTools, ...tools]
+/* Hand-built tools first, then the generic /tools/[slug] tools. Only working tools are listed. */
+const allTools: (Tool | StandaloneTool)[] = [...standaloneTools, ...tools].filter(isLive)
 
-/* Only working tools get a link; everything else stays "Coming soon" */
-function toolHref(tool: Tool | StandaloneTool): string | null {
-  if (!isLive(tool)) return null
+function toolHref(tool: Tool | StandaloneTool): string {
   return "href" in tool ? tool.href : `/tools/${tool.slug}`
 }
 
@@ -127,13 +125,6 @@ export default function ToolsHub() {
                       <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                         {tool.description || "Developer utility tool"}
                       </p>
-
-                      {/* STATUS */}
-                      {!path && (
-                        <div className="mt-3 text-xs text-gray-400">
-                          Coming soon
-                        </div>
-                      )}
 
                       {/* HOVER GLOW */}
                       {path && (

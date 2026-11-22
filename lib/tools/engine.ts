@@ -57,8 +57,6 @@ const textInput = { inputLanguage: "plaintext", outputLanguage: "plaintext", acc
 export const toolDefinitions: Record<string, ToolDefinition> = {
   /* ---------------- JSON ---------------- */
   "json-formatter": { ...jsonBase, primary: format, extra: [minify, validate], outputLabel: "Formatted JSON" },
-  "json-pretty": { ...jsonBase, primary: format, extra: [minify], outputLabel: "Pretty-printed JSON" },
-  "json-viewer": { ...jsonBase, primary: { label: "View", run: (i) => formatJson(i) }, outputLabel: "Formatted view" },
   "json-minify": { ...jsonBase, primary: minify, extra: [format], outputLabel: "Minified JSON" },
   "json-validator": { ...jsonBase, primary: validate, extra: [format], outputLabel: "Validation result", outputLanguage: "plaintext" },
 
@@ -84,7 +82,12 @@ export const toolDefinitions: Record<string, ToolDefinition> = {
   "url-encoder": {
     ...textInput,
     primary: { label: "Encode", run: (i) => urlEncode(i, "component") },
-    extra: [{ label: "Decode", run: (i) => urlDecode(i, "component") }],
+    // Modes carried over from the former /tools/url-encoder-decoder page (lib/tools/url.ts)
+    extra: [
+      { label: "Encode full URL", run: (i) => urlEncode(i, "full") },
+      { label: "Encode form (+ for spaces)", run: (i) => urlEncode(i, "form") },
+      { label: "Decode", run: (i) => urlDecode(i, "component") },
+    ],
     inputLabel: "Text to encode",
     outputLabel: "Percent-encoded",
     inputPlaceholder: "e.g. name=José & co/2024",
@@ -93,7 +96,10 @@ export const toolDefinitions: Record<string, ToolDefinition> = {
   "url-decoder": {
     ...textInput,
     primary: { label: "Decode", run: (i) => urlDecode(i, "component") },
-    extra: [{ label: "Encode", run: (i) => urlEncode(i, "component") }],
+    extra: [
+      { label: "Decode form (+ as space)", run: (i) => urlDecode(i, "form") },
+      { label: "Encode", run: (i) => urlEncode(i, "component") },
+    ],
     inputLabel: "Percent-encoded text",
     outputLabel: "Decoded text",
     inputPlaceholder: "e.g. caf%C3%A9%20%26%20co",

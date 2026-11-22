@@ -11,11 +11,9 @@ export const dynamic = "force-static"
  * Only URLs that render real, working, indexable content belong here.
  * Every entry has a lastModified date (from Git history, see lib/lastModified.ts).
  *
- * Deliberately excluded (the routes still exist; most are also noindex):
- *  - /tools/[slug] pages and categories whose status isn't "live" (noindex)
- *  - /convert/*, /converters/*, /calculators and /calculators/<slug> thin pages (noindex, follow)
- *  - /compiler/* and /online-compiler (the run API is not deployed)
- *  - /playground, /apis, /docs/* (depend on mock API routes that are not deployed)
+ * /tools/[slug] and category pages are only built for live tools, so all of them are listed.
+ * Deliberately excluded: standalone tools whose status isn't "live" (/tools/schema-validator,
+ * which still exists but is noindex).
  */
 
 /* Source paths that make up each kind of page (shared UI is included, as it changes the page) */

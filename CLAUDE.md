@@ -44,14 +44,11 @@ app/                     Routes (App Router)
   sitemap.ts, robots.ts  sitemap.xml and robots.txt (prerendered)
   tools/
     page.tsx             /tools hub metadata (server); UI in ToolsHub.tsx (client, own hard-coded category list)
-    [slug]/page.tsx      Generic tool route, one static page per entry in data/tools.ts
-    [slug]/ToolPageClient.tsx   Old generic page, used by tools without data/toolPages.ts content
-    category/[category]/ Category listing pages
-    view-source/, schema-validator/, url-encoder-decoder/   Hand-built "standalone" tools
+    [slug]/page.tsx      Generic tool route, one static page per live tool in data/tools.ts
+    category/[category]/ Category listing pages (only categories with a live tool)
+    view-source/, schema-validator/   Hand-built "standalone" tools
   learn/                 Guides index + [slug] article pages (MDX from content/learn)
   http-status-codes/, about/, contact/, privacy-policy/, terms/, disclaimer/
-  (also: apis, docs, playground, online-compiler, compiler, calculators, convert, converters. These are
-   legacy and unlinked. See the audit before you touch them.)
 components/
   tools/                 Tool page template: ToolPage (server), ToolWorkbench (client), ToolLayout, CodeEditor
   nav/                   navData.ts (header/footer links), ToolsMenu, SearchDialog
@@ -59,7 +56,8 @@ components/
   Header.tsx, Footer.tsx
 data/
   tools.ts               TOOL REGISTRY: slug, name, description, category, status; standaloneTools; toolCategories
-  toolPages.ts           Per-tool page content (meta description, intro, how-to, formats, limitations, FAQ)
+  toolPages.ts           Per-tool page content (title, H1, meta description, intro, how-to, formats, limitations,
+                         worked examples, common errors, FAQ)
 lib/
   tools/*.ts             Tool logic (pure functions returning ToolResult) and engine.ts (tool definitions)
   site.ts                SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE, pageMetadata() helper
@@ -69,18 +67,18 @@ lib/
 content/learn/*.mdx      Guide articles (frontmatter: title, description, date, category, keywords, faqs)
 public/
   _headers               Cloudflare Pages headers (CSP etc.). Must mirror lib/securityHeaders.ts.
-  _redirects             Cloudflare Pages redirects (mirror of next.config.ts redirects())
+  _redirects             Cloudflare Pages redirects (the only redirects production uses)
   ads.txt, site.webmanifest, icons
 tests/unit/              Unit tests
 ```
 
 ### Where things live
 
-- **Tool pages:** `app/tools/[slug]/page.tsx` picks the shared template `components/tools/ToolPage.tsx` when the
-  tool is live, has a definition in `lib/tools/engine.ts` and has content in `data/toolPages.ts`. Otherwise it
-  falls back to `ToolPageClient.tsx`. Standalone tools live in `app/tools/<slug>/`.
-- **Tool content:** `data/toolPages.ts` (per tool). The fallback page uses generic boilerplate from
-  `components/tools/ToolContent.tsx`, `ToolFAQ.tsx` and `ToolExample.tsx`.
+- **Tool pages:** `app/tools/[slug]/page.tsx` renders the shared template `components/tools/ToolPage.tsx`. A page is
+  built only when the tool is live, has a definition in `lib/tools/engine.ts` and has content in `data/toolPages.ts`;
+  every other slug is a 404. Standalone tools live in `app/tools/<slug>/`.
+- **Tool content:** `data/toolPages.ts` (per tool). `tests/unit/toolPages.test.ts` checks that every example output and
+  quoted error is the engine's real output, and that no sentence appears on more than one tool page.
 - **Tool logic:** `lib/tools/<name>.ts`. It is wired to the UI in `lib/tools/engine.ts` (`toolDefinitions`).
 - **Metadata:** site-wide defaults are in `app/layout.tsx`. Each page sets its own through `pageMetadata()` in
   `lib/site.ts`, which adds a self-referencing canonical and complete OG/Twitter blocks. The homepage
@@ -105,13 +103,14 @@ tests/unit/              Unit tests
    extra actions, input/output labels, editor languages, placeholder, `sample` and optional `accept`
    (file types for upload). The sample must produce a successful result (tested).
 4. **Registry:** add or update the entry in `data/tools.ts` (`slug`, `name`, `description`, `category`,
-   `status`). Use `"planned"` or `"partial"` until the tool works. Those statuses render a "not available yet"
-   page that is `noindex` and unlinked. Setting `"live"` automatically adds the tool to the header menu,
+   `status`). Use `"planned"` or `"partial"` until the tool works. Those tools get no page (404) and are not
+   listed anywhere. Setting `"live"` automatically adds the tool to the header menu,
    footer, homepage, /tools hub, search, related tools and the sitemap. A new category also needs an entry in
    `toolCategories` (in `data/tools.ts`) and in the hard-coded `categories` map in `app/tools/ToolsHub.tsx`.
-5. **Page content:** add an entry to `data/toolPages.ts` (`metaDescription`, `intro`, `howTo`, `formats`,
-   `limitations`, optional `faq` and `related`). Describe only what the code really does, and state the
-   limitations. Without this entry the tool falls back to the old generic page with boilerplate text.
+5. **Page content:** add an entry to `data/toolPages.ts` (`title`, `h1`, `metaDescription`, `intro`, 3 to 5 `howTo`
+   steps, `formats`, `limitations`, 2 `examples`, `errors`, 4 `faq` entries, optional `related`). Describe only
+   what the code really does, run every example through the engine, state the limitations and mark unsure facts
+   with TODO. A live tool without this entry has no page (the tests fail).
 6. **Verify:** typecheck, tests, production build, then check the page in a browser
    (input, every action, upload, copy, download, error message, light and dark theme, phone width).
 
@@ -145,6 +144,9 @@ Standalone tools with a custom UI go in `app/tools/<slug>/page.tsx` (server comp
   `components/ThemeToggle.tsx` must stay in sync.
 - `robots.ts` allows crawling only when built by Cloudflare Pages for the `main` branch
   (`CF_PAGES=1`, `CF_PAGES_BRANCH=main`). Preview, local and other builds disallow everything.
-- Unfinished routes use `pageMetadata({ ..., noindex: true, nofollow: true })`. Client-component pages
-  (`/playground`, `/online-compiler`) get their robots rule from a segment `layout.tsx`.
+- Unfinished routes use `pageMetadata({ ..., noindex: true, nofollow: true })`. A client-component page
+  gets its robots rule from a segment `layout.tsx`.
+- Redirects go in `public/_redirects` only. Removed routes (`/calculators*`, `/convert/*`, `/converters/*`)
+  301 to `/tools`. `/apis`, `/docs`, `/playground`, `/online-compiler` and `/compiler` were removed
+  without redirects (never indexed).
 - The homepage title and site description are defined once, in `lib/site.ts` (`HOME_TITLE`, `SITE_DESCRIPTION`).

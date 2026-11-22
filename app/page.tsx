@@ -194,7 +194,7 @@ export default function Home() {
             <BadgeCheck className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
             <div>
               <h3 className="font-semibold text-foreground">Tested before listed</h3>
-              <p className="mt-1 text-sm text-muted">Tools that are still in development are clearly marked “coming soon” instead of shipping half-finished.</p>
+              <p className="mt-1 text-sm text-muted">Tools that are still in development are not listed until they work.</p>
             </div>
           </li>
         </ul>
